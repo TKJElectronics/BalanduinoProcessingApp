@@ -401,14 +401,10 @@ void Connect(int value) {
   else if (connectedSerial)
     println("Already connected to a port!");
 }
-void Disconnect(int value) {
-  if (connectedSerial) { //Check if there is a connection established  
-    println("DisconnectSerial");
-    serial.stop();
-    serial.clear(); // Empty the buffer
-    connectedSerial = false;
-    initialized = false;
-  }
-  else
-    println("Couldn't disconnect");
+void Disconnect(int value) {  
+  println("DisconnectSerial");
+  serial.stop();
+  serial.clear(); // Empty the buffer
+  connectedSerial = false;
+  initialized = false;
 }
