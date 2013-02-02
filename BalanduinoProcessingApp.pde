@@ -127,23 +127,13 @@ void setup() {
       }
     }
   }*/
+  drawGraph(); // Draw graph at startup
 }
 
 void draw() {
   /* Draw Graph */
-  background(255); // white
-  for (int i = 0;i<=width/10;i++) {      
-    stroke(200); // gray
-    line((-frameCount%10)+i*10, 0, (-frameCount%10)+i*10, height);
-    line(0, i*10, width, i*10);
-  }
-
-  stroke(0); // black
-  for (int i = 1; i <= 3; i++)
-    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
-
-  convert();
-  drawAxis();    
+  if(connectedSerial)
+    drawGraph();
 
   /* Remote contol */
   //background(0);
@@ -194,6 +184,19 @@ void draw() {
     }
     sendData = false;
   }
+}
+void drawGraph() {
+  background(255); // white
+  for (int i = 0;i<=width/10;i++) {      
+    stroke(200); // gray
+    line((-frameCount%10)+i*10, 0, (-frameCount%10)+i*10, height);
+    line(0, i*10, width, i*10);
+  }
+  stroke(0); // black
+  for (int i = 1; i <= 3; i++)
+    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
+  convert();
+  drawAxis();
 }
 void Abort(int theValue) {
   if (connectedSerial) {
