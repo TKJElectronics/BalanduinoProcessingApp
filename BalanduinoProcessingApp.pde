@@ -107,26 +107,7 @@ void setup() {
       delay(10);
       serial.write("GB;"); // Send graph data
     }
-  }/*
-  for (int i=0; i<Serial.list().length; i++) { // Automaticly connect to the Balancing Robot on Mac OS X and Linux 
-    if (Serial.list()[i].indexOf("tty.BalancingRobot") != -1) {
-      println(Serial.list()[i]);
-      try {
-        serial = new Serial(this, Serial.list()[i], 115200);
-      } catch (Exception e) {
-        //e.printStackTrace();
-        println("Couldn't open serial port");
-      }            
-      if (serial != null) {
-        serial.bufferUntil('\n');
-        connectedSerial = true;
-        delay(100);
-        serial.write("GP;"); // Go
-        delay(10);
-        serial.write("GB;"); // Send graph data
-      }
-    }
-  }*/
+  }
   drawGraph(); // Draw graph at startup
 }
 
