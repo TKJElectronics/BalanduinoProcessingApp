@@ -3,7 +3,7 @@
 <plist version="0.9">
   <dict>
     <key>CFBundleName</key>
-    <string>ProcessingApp</string>
+    <string>BalanduinoProcessingApp</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
     <key>CFBundleAllowMixedLocalizations</key>
@@ -21,7 +21,7 @@
     <key>CFBundleIconFile</key>
     <string>sketch.icns</string>
     <key>CFBundleIdentifier</key> 
-    <string>ProcessingApp</string>
+    <string>BalanduinoProcessingApp</string>
 
     <!-- http://developer.apple.com/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/PListKeys.html#//apple_ref/doc/uid/20001431-113616 -->
     <key>LSUIPresentationMode</key>
@@ -39,13 +39,13 @@
       <string></string>
 
       <key>MainClass</key>
-      <string>ProcessingApp</string>
+      <string>BalanduinoProcessingApp</string>
 
       <key>JVMVersion</key>
       <string>1.6*</string>
 
       <key>ClassPath</key>
-      <string>$JAVAROOT/ProcessingApp.jar:$JAVAROOT/core.jar:$JAVAROOT/jogl-all.jar:$JAVAROOT/gluegen-rt.jar:$JAVAROOT/jogl-all-natives-macosx-universal.jar:$JAVAROOT/gluegen-rt-natives-macosx-universal.jar:$JAVAROOT/RXTXcomm.jar:$JAVAROOT/serial.jar:$JAVAROOT/controlP5.jar</string>
+      <string>$JAVAROOT/BalanduinoProcessingApp.jar:$JAVAROOT/core.jar:$JAVAROOT/jogl-all.jar:$JAVAROOT/gluegen-rt.jar:$JAVAROOT/jogl-all-natives-macosx-universal.jar:$JAVAROOT/gluegen-rt-natives-macosx-universal.jar:$JAVAROOT/RXTXcomm.jar:$JAVAROOT/serial.jar:$JAVAROOT/controlP5.jar</string>
 
       <!-- http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
       <key>Properties</key>

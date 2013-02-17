@@ -107,43 +107,14 @@ void setup() {
       delay(10);
       serial.write("GB;"); // Send graph data
     }
-  }/*
-  for (int i=0; i<Serial.list().length; i++) { // Automaticly connect to the Balancing Robot on Mac OS X and Linux 
-    if (Serial.list()[i].indexOf("tty.BalancingRobot") != -1) {
-      println(Serial.list()[i]);
-      try {
-        serial = new Serial(this, Serial.list()[i], 115200);
-      } catch (Exception e) {
-        //e.printStackTrace();
-        println("Couldn't open serial port");
-      }            
-      if (serial != null) {
-        serial.bufferUntil('\n');
-        connectedSerial = true;
-        delay(100);
-        serial.write("GP;"); // Go
-        delay(10);
-        serial.write("GB;"); // Send graph data
-      }
-    }
-  }*/
+  }
+  drawGraph(); // Draw graph at startup
 }
 
 void draw() {
   /* Draw Graph */
-  background(255); // white
-  for (int i = 0;i<=width/10;i++) {      
-    stroke(200); // gray
-    line((-frameCount%10)+i*10, 0, (-frameCount%10)+i*10, height);
-    line(0, i*10, width, i*10);
-  }
-
-  stroke(0); // black
-  for (int i = 1; i <= 3; i++)
-    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
-
-  convert();
-  drawAxis();    
+  if(connectedSerial)
+    drawGraph();
 
   /* Remote contol */
   //background(0);
@@ -194,6 +165,19 @@ void draw() {
     }
     sendData = false;
   }
+}
+void drawGraph() {
+  background(255); // white
+  for (int i = 0;i<=width/10;i++) {      
+    stroke(200); // gray
+    line((-frameCount%10)+i*10, 0, (-frameCount%10)+i*10, height);
+    line(0, i*10, width, i*10);
+  }
+  stroke(0); // black
+  for (int i = 1; i <= 3; i++)
+    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
+  convert();
+  drawAxis();
 }
 void Abort(int theValue) {
   if (connectedSerial) {
@@ -401,14 +385,10 @@ void Connect(int value) {
   else if (connectedSerial)
     println("Already connected to a port!");
 }
-void Disconnect(int value) {
-  if (connectedSerial) { //Check if there is a connection established  
-    println("DisconnectSerial");
-    serial.stop();
-    serial.clear(); // Empty the buffer
-    connectedSerial = false;
-    initialized = false;
-  }
-  else
-    println("Couldn't disconnect");
+void Disconnect(int value) {  
+  println("DisconnectSerial");
+  serial.stop();
+  serial.clear(); // Empty the buffer
+  connectedSerial = false;
+  initialized = false;
 }

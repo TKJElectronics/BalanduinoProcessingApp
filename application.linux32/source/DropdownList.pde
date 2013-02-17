@@ -23,5 +23,12 @@ void customize(DropdownList ddl) {
   }
   ddl.setColorBackground(color(60));
   ddl.setColorActive(color(255, 128));
+  
+  for (int i=0; i<Serial.list().length; i++) { // Automaticly select the Balanduino balancing robot on Mac OS X and Linux 
+    if (Serial.list()[i].indexOf("Balanduino") != -1 || Serial.list()[i].indexOf("Balancing") != -1) {
+      ddl.setValue(i);
+      break;
+    }
+  }
 }
 
