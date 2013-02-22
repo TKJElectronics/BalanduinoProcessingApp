@@ -32,18 +32,16 @@ String stringTargetAngle = "";
 
 PFont f;
 
-boolean useDropDownLists = true; // Set if you want to use the dropdownlist or not
+final boolean useDropDownLists = true; // Set if you want to use the dropdownlist or not
 byte defaultComPort = 0;
-int defaultBaudrate = 115200;
 
-//Dropdown lists
+// Dropdown list
 DropdownList COMports; // Define the variable ports as a Dropdownlist.
 Serial serial; // Define the variable port as a Serial object.
 int portNumber = -1; // The dropdown list will return a float value, which we will connvert into an int. We will use this int for that.
 
 boolean connectedSerial;
 boolean aborted;
-boolean initialized; // True if connected to the device
 
 boolean upPressed;
 boolean downPressed;
@@ -55,9 +53,12 @@ String stringGyro;
 String stringAcc;
 String stringKalman;
 
-float[] acc = new float[600];
-float[] gyro = new float[600];
-float[] kalman = new float[600];
+/* We will store 101 readings */
+float[] acc = new float[101];
+float[] gyro = new float[101];
+float[] kalman = new float[101];
+
+boolean drawValues;
 
 public void setup() {
   controlP5 = new ControlP5(this);
@@ -99,25 +100,28 @@ public void setup() {
 
   controlP5.addButton("Abort", 0, 10, 300, 40, 20);
   controlP5.addButton("Continue", 0, 55, 300, 50, 20);
-  controlP5.addButton("StoreValues", 0, 267, 300, 60, 20);
+  Button b = controlP5.addButton("RestoreDefaults", 0, 175, 300, 82, 20);
+  b.captionLabel().set("Restore defaults");
+  b = controlP5.addButton("StoreValues", 0, 262, 300, 65, 20);
+  b.captionLabel().set("Store values");
   
-  for (int i=0;i<600;i++) { // center all variables    
+  for (int i=0;i<gyro.length;i++) { // center all variables    
     gyro[i] = height/2;
     acc[i] = height/2; 
     kalman[i] = height/2;
   }
 
   //println(Serial.list()); // Used for debugging
-  if (useDropDownLists)
+  if(useDropDownLists)
     initDropdownlist();
   else { // if useDropDownLists is false, it will connect automatically at startup
     try {
-      serial = new Serial(this, Serial.list()[defaultComPort], defaultBaudrate);
+      serial = new Serial(this, Serial.list()[defaultComPort], 115200);
     } catch (Exception e) {
       //e.printStackTrace();
       println("Couldn't open serial port");
     }
-    if (serial != null) {
+    if(serial != null) {
       serial.bufferUntil('\n');
       connectedSerial = true;
       delay(100);
@@ -131,11 +135,12 @@ public void setup() {
 
 public void draw() {
   /* Draw Graph */
-  if(connectedSerial)
+  if(connectedSerial && drawValues) {
+    drawValues = false;
     drawGraph();
+  }
 
   /* Remote contol */
-  //background(0);
   fill(0);
   stroke(0);
   rect(0, 0, 337, height);
@@ -156,26 +161,26 @@ public void draw() {
   textAlign(LEFT);
   text("P: " + stringP + " I: " + stringI +  " D: " + stringD + " TargetAngle: " + stringTargetAngle, 10, height-50);
 
-  if (sendData) { // Data is send as a x,y-coordinates
-    if (upPressed) {
-      if (leftPressed)
+  if(sendData) { // Data is send as x,y-coordinates
+    if(upPressed) {
+      if(leftPressed)
         serial.write("J,-0.7,0.7;"); // Forward left
-      else if (rightPressed)
+      else if(rightPressed)
         serial.write("J,0.7,0.7;"); // Forward right
       else
         serial.write("J,0,0.7;"); // Forward
     }
-    else if (downPressed) {
-      if (leftPressed)
+    else if(downPressed) {
+      if(leftPressed)
         serial.write("J,-0.7,-0.7;"); // Backward left
-      else if (rightPressed)
+      else if(rightPressed)
         serial.write("J,0.7,-0.7;"); // Backward right
       else
         serial.write("J,0,-0.7;"); // Backward
     } 
-    else if (leftPressed)
+    else if(leftPressed)
       serial.write("J,-0.7,0;"); // Left
-    else if (rightPressed)
+    else if(rightPressed)
       serial.write("J,0.7,0;"); // Right
     else {
       serial.write("S;");
@@ -184,21 +189,8 @@ public void draw() {
     sendData = false;
   }
 }
-public void drawGraph() {
-  background(255); // white
-  for (int i = 0;i<=width/10;i++) {      
-    stroke(200); // gray
-    line((-frameCount%10)+i*10, 0, (-frameCount%10)+i*10, height);
-    line(0, i*10, width, i*10);
-  }
-  stroke(0); // black
-  for (int i = 1; i <= 3; i++)
-    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
-  convert();
-  drawAxis();
-}
 public void Abort(int theValue) {
-  if (connectedSerial) {
+  if(connectedSerial) {
     serial.write("A;");
     println("Abort");
     aborted = true;
@@ -206,7 +198,7 @@ public void Abort(int theValue) {
     println("Establish a serial connection first!");
 }
 public void Continue(int theValue) {
-  if (connectedSerial) {
+  if(connectedSerial) {
     serial.write("C");
     println("Continue");
     aborted = false;
@@ -214,25 +206,33 @@ public void Continue(int theValue) {
     println("Establish a serial connection first!");
 }
 public void Submit(int theValue) {
-  if (connectedSerial) {    
+  if(connectedSerial) {    
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
-    String output1 = "P," + P.getText() + ';';
-    String output2 = "I," + I.getText() + ';';
-    String output3 = "D," + D.getText() + ';';
-    String output4 = "T," + targetAngle.getText() + ';';
-
-    serial.write(output1);
-    delay(10);
-    serial.write(output2);
-    delay(10);
-    serial.write(output3);
-    delay(10);
-    serial.write(output4);
-    delay(10);    
+    
+    if(!P.getText().equals(stringP)) {
+      println("Send P value");
+      serial.write("P," + P.getText() + ';');
+      delay(10);
+    }
+    if(!I.getText().equals(stringI)) {
+      println("Send I value");
+      serial.write("I," + I.getText() + ';');
+      delay(10);
+    }
+    if(!D.getText().equals(stringD)) {
+      println("Send D value");
+      String output = "D," + D.getText() + ';';
+      serial.write(output);
+      delay(10);
+    }
+    if(!targetAngle.getText().equals(stringTargetAngle)) {
+      println("Send target angle");
+      serial.write("T," + targetAngle.getText() + ';');
+      delay(10);
+    }  
     serial.write("GP;"); // Send values back to application
     delay(10);
-  }
-  else
+  } else
     println("Establish a serial connection first!");
 }
 public void Clear(int theValue) {
@@ -241,39 +241,47 @@ public void Clear(int theValue) {
   D.clear();
   targetAngle.clear();
 }
+public void RestoreDefaults(int theValue) {
+  if(connectedSerial) {
+    serial.write("R;"); // Send values back to application
+    println("RestoreDefaults");
+    delay(10);
+  } else
+    println("Establish a serial connection first!");
+}
 public void StoreValues(int theValue) {
   //Don't set the text if the string is empty or it will crash
-  if (stringP != null)
+  if(stringP != null)
     P.setText(stringP);
-  if (stringI != null)
+  if(stringI != null)
     I.setText(stringI);
-  if (stringD != null)
+  if(stringD != null)
     D.setText(stringD);
-  if (stringTargetAngle != null)
+  if(stringTargetAngle != null)
     targetAngle.setText(stringTargetAngle);
 }
 public void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
-  for (int i = 0; i<input.length;i++)
-    println("Number: " + i + " Input: " + input[i]); // For debugging
+  //for (int i = 0; i<input.length;i++) // Uncomment for debugging
+    //println("Number: " + i + " Input: " + input[i]);
 
-  if (input[0].equals("P")) {    
-    if (input[1].length() > 5)
+  if(input[0].equals("P")) {    
+    if(input[1].length() > 5)
       stringP = input[1].substring(0, 5);
     else
       stringP = input[1];
       
-    if (input[2].length() > 5)
+    if(input[2].length() > 5)
       stringI = input[2].substring(0, 5);
     else
       stringI = input[2];
       
-    if (input[3].length() > 5)
+    if(input[3].length() > 5)
       stringD = input[3].substring(0, 5);
     else
       stringD = input[3];
       
-    if (input[4].length() > 6)
+    if(input[4].length() > 6)
       stringTargetAngle = input[4].substring(0, 6);
     else
       stringTargetAngle = input[4];
@@ -287,101 +295,99 @@ public void serialEvent(Serial serial) {
     print(stringGyro);
     print(stringKalman);*/
   }
-  serial.clear();  // Empty the buffer  
+  serial.clear();  // Empty the buffer
+  drawValues = true; // Draw the graph
 }
 public void keyPressed() {
-  if (key == 's' || key == 'S')
+  if(key == 's' || key == 'S')
     StoreValues(0);
-  if (key == TAB) { //'\t'
-    if (P.isFocus()) {
+  if(key == TAB) { //'\t'
+    if(P.isFocus()) {
       P.setFocus(false);
       I.setFocus(true);
-    } else if (I.isFocus()) {
+    } else if(I.isFocus()) {
       I.setFocus(false);
       D.setFocus(true);
-    } else if (D.isFocus()) {
+    } else if(D.isFocus()) {
       D.setFocus(false);
       targetAngle.setFocus(true);
-    } else if (targetAngle.isFocus()) {
+    } else if(targetAngle.isFocus()) {
       targetAngle.setFocus(false);
       P.setFocus(true);
     } else
       P.setFocus(true);
   }
-  else if (key == ENTER) // '\n'
+  else if(key == ENTER) // '\n'
     Submit(0);
-  else if (key == ESC) {
-    if (aborted)
+  else if(key == ESC) {
+    if(aborted)
       Continue(0);
     else
       Abort(0);      
     key = 0; // Disable Processing from quiting when pressing ESC
-  } 
-  else if (key == CODED) { 
-    if (connectedSerial) {
-      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
-          if (keyCode == LEFT) {  
+  } else if(key == CODED) { 
+    if(connectedSerial) {
+      if(!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
+        if(keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
+          if(keyCode == LEFT) {  
             leftPressed = true;
             println("Left pressed");
           }
-          if (keyCode == UP) {
+          if(keyCode == UP) {
             upPressed = true;
             println("Forward pressed");
           }
-          if (keyCode == DOWN) {
+          if(keyCode == DOWN) {
             downPressed = true;
             println("Backward pressed");
           }
-          if (keyCode == RIGHT) {
+          if(keyCode == RIGHT) {
             rightPressed = true;
             println("Right pressed");
           }
           sendData = true;
         }
       }
-    }
-    else
+    } else
       println("Establish a serial connection first!");
   }
 }
 public void keyReleased() {
-  if (connectedSerial) {
-    if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
-        if (keyCode == LEFT) {
+  if(connectedSerial) {
+    if(!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
+      if(keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
+        if(keyCode == LEFT) {
           leftPressed = false;
           println("Left released");
         }
-        if (keyCode == UP) {
+        if(keyCode == UP) {
           upPressed = false;
           println("Up released");
         }
-        if (keyCode == DOWN) {
+        if(keyCode == DOWN) {
           downPressed = false;
           println("Down released");
         }
-        if (keyCode == RIGHT) {
+        if(keyCode == RIGHT) {
           rightPressed = false;
           println("Right released");
         }
         sendData = true;
       }
     }
-  }
-  else
+  } else
     println("Establish a serial connection first!");
 }
 public void controlEvent(ControlEvent theEvent) {
-  if (theEvent.isGroup()) {
-    if (theEvent.group().name() == "COMPort")     
+  if(theEvent.isGroup()) {
+    if(theEvent.group().name() == "COMPort")
       portNumber = PApplet.parseInt(theEvent.group().value()); //Since the list returns a float, we need to convert it to an int. For that we us the int() function.
   }
 }
 public void Connect(int value) {     
-  if (connectedSerial) // Disconnect existing connection
+  if(connectedSerial) // Disconnect existing connection
     Disconnect(0);
-  if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
+  if(portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
     println("ConnectSerial");    
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
@@ -389,7 +395,7 @@ public void Connect(int value) {
       //e.printStackTrace();
       println("Couldn't open serial port");
     }  
-    if (serial != null) {      
+    if(serial != null) {      
       serial.bufferUntil('\n');
       connectedSerial = true;
       delay(100);
@@ -397,10 +403,9 @@ public void Connect(int value) {
       delay(10);
       serial.write("GB;"); // Request graph data
     }
-  }
-  else if (portNumber == -1)
+  } else if(portNumber == -1)
     println("Select COM Port first!");
-  else if (connectedSerial)
+  else if(connectedSerial)
     println("Already connected to a port!");
 }
 public void Disconnect(int value) {  
@@ -408,13 +413,27 @@ public void Disconnect(int value) {
   serial.stop();
   serial.clear(); // Empty the buffer
   connectedSerial = false;
-  initialized = false;
 }
 //convert all axis
-int minAngle = 0;
-int maxAngle = 360;
+final int minAngle = 0;
+final int maxAngle = 360;
 
-public void convert() {   
+public void drawGraph() {
+  background(255); // white  
+  for (int i = 0;i<gyro.length;i++) {
+    stroke(200); // gray
+    line(337+i*10, 0, 337+i*10, height);
+    line(337, i*10, 337+width, i*10);
+  }
+  
+  stroke(0); // black
+  for (int i = 1; i <= 3; i++)
+    line(337, height/4*i, width, height/4*i); // Draw line, indicating 90 deg, 180 deg, and 270 deg
+  convert();
+  drawAxis();
+}
+
+public void convert() {
   /* convert the gyro x-axis */
   if (stringGyro != null) {
     // trim off any whitespace:
@@ -437,6 +456,7 @@ public void convert() {
     kalman[kalman.length-1] = map(PApplet.parseFloat(stringKalman), minAngle, maxAngle, 0, height);
   }
 }
+
 public void drawAxis() { 
   /* draw acceleromter x-axis */
   noFill();
@@ -444,7 +464,7 @@ public void drawAxis() {
   // redraw everything
   beginShape();
   for(int i = 0; i<acc.length;i++)
-    vertex(i+337,height-acc[i]);  
+    vertex(i*6+337,height-acc[i]);
   endShape();
   // put all data one array back
   for(int i = 1; i<acc.length;i++)
@@ -456,7 +476,7 @@ public void drawAxis() {
   // redraw everything
   beginShape();
   for(int i = 0; i<gyro.length;i++)
-    vertex(i+337,height-gyro[i]);
+    vertex(i*6+337,height-gyro[i]);
   endShape();
   // put all data one array back
   for(int i = 1; i<gyro.length;i++)
@@ -468,7 +488,7 @@ public void drawAxis() {
   // redraw everything
   beginShape();
   for(int i = 0; i<kalman.length;i++)
-    vertex(i+337,height-kalman[i]);  
+    vertex(i*6+337,height-kalman[i]);
   endShape();
   // put all data one array back
   for(int i = 1; i<kalman.length;i++)
