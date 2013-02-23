@@ -82,10 +82,12 @@ void setup() {
 
   controlP5.addButton("Abort", 0, 10, 300, 40, 20);
   controlP5.addButton("Continue", 0, 55, 300, 50, 20);
-  Button b = controlP5.addButton("RestoreDefaults", 0, 175, 300, 82, 20);
-  b.captionLabel().set("Restore defaults");
-  b = controlP5.addButton("StoreValues", 0, 262, 300, 65, 20);
+  Button b = controlP5.addButton("StoreValues", 0, 175, 300, 65, 20);
   b.captionLabel().set("Store values");
+  b = controlP5.addButton("PairWithWiimote", 0, 245, 275, 82, 20);
+  b.captionLabel().set("Pair with Wiimote");
+  b = controlP5.addButton("RestoreDefaults", 0, 245, 300, 82, 20);
+  b.captionLabel().set("Restore defaults");
   
   for (int i=0;i<gyro.length;i++) { // center all variables    
     gyro[i] = height/2;
@@ -227,6 +229,14 @@ void RestoreDefaults(int theValue) {
   if(connectedSerial) {
     serial.write("R;"); // Send values back to application
     println("RestoreDefaults");
+    delay(10);
+  } else
+    println("Establish a serial connection first!");
+}
+void PairWithWiimote(int theValue) {
+  if(connectedSerial) {
+    serial.write("W;"); // Send values back to application
+    println("Pair with Wiimote");
     delay(10);
   } else
     println("Establish a serial connection first!");
