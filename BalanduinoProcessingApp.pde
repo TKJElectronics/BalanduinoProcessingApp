@@ -400,9 +400,14 @@ void Connect(int value) {
   else if(connectedSerial)
     println("Already connected to a port!");
 }
-void Disconnect(int value) {  
-  println("DisconnectSerial");
-  serial.stop();
-  serial.clear(); // Empty the buffer
-  connectedSerial = false;
+void Disconnect(int value) {    
+  try {
+    serial.stop();
+    serial.clear(); // Empty the buffer
+    connectedSerial = false;
+    println("DisconnectSerial");
+  } catch (Exception e) {
+    //e.printStackTrace();
+    println("Couldn't disconnect serial port");
+  } 
 }
