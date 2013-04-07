@@ -109,9 +109,9 @@ void setup() {
       serial.bufferUntil('\n');
       connectedSerial = true;
       delay(100);
-      serial.write("GP;"); // Go
+      serial.write("GP;"); // Get PID values
       delay(10);
-      serial.write("GB;"); // Send graph data
+      serial.write("IB;"); // Get IMU Data
     }
   }
   drawGraph(); // Draw graph at startup
@@ -148,26 +148,26 @@ void draw() {
   if(sendData) { // Data is send as x,y-coordinates
     if(upPressed) {
       if(leftPressed)
-        serial.write("J,-0.7,0.7;"); // Forward left
+        serial.write("CJ,-0.7,0.7;"); // Forward left
       else if(rightPressed)
-        serial.write("J,0.7,0.7;"); // Forward right
+        serial.write("CJ,0.7,0.7;"); // Forward right
       else
-        serial.write("J,0,0.7;"); // Forward
+        serial.write("CJ,0,0.7;"); // Forward
     }
     else if(downPressed) {
       if(leftPressed)
-        serial.write("J,-0.7,-0.7;"); // Backward left
+        serial.write("CJ,-0.7,-0.7;"); // Backward left
       else if(rightPressed)
-        serial.write("J,0.7,-0.7;"); // Backward right
+        serial.write("CJ,0.7,-0.7;"); // Backward right
       else
-        serial.write("J,0,-0.7;"); // Backward
+        serial.write("CJ,0,-0.7;"); // Backward
     } 
     else if(leftPressed)
-      serial.write("J,-0.7,0;"); // Left
+      serial.write("CJ,-0.7,0;"); // Left
     else if(rightPressed)
-      serial.write("J,0.7,0;"); // Right
+      serial.write("CJ,0.7,0;"); // Right
     else {
-      serial.write("S;");
+      serial.write("CS;");
       println("Stop");
     }
     sendData = false;
@@ -195,26 +195,26 @@ void Submit(int theValue) {
     
     if(!P.getText().equals(stringP)) {
       println("Send P value");
-      serial.write("P," + P.getText() + ';');
+      serial.write("SP," + P.getText() + ';');
       delay(10);
     }
     if(!I.getText().equals(stringI)) {
       println("Send I value");
-      serial.write("I," + I.getText() + ';');
+      serial.write("SI," + I.getText() + ';');
       delay(10);
     }
     if(!D.getText().equals(stringD)) {
       println("Send D value");
-      String output = "D," + D.getText() + ';';
+      String output = "SD," + D.getText() + ';';
       serial.write(output);
       delay(10);
     }
     if(!targetAngle.getText().equals(stringTargetAngle)) {
       println("Send target angle");
-      serial.write("T," + targetAngle.getText() + ';');
+      serial.write("ST," + targetAngle.getText() + ';');
       delay(10);
     }  
-    serial.write("GP;"); // Send values back to application
+    serial.write("GP;"); // Get PID values
     delay(10);
   } else
     println("Establish a serial connection first!");
@@ -227,7 +227,7 @@ void Clear(int theValue) {
 }
 void RestoreDefaults(int theValue) {
   if(connectedSerial) {
-    serial.write("R;"); // Send values back to application
+    serial.write("CR;"); // Restore values
     println("RestoreDefaults");
     delay(10);
   } else
@@ -235,7 +235,7 @@ void RestoreDefaults(int theValue) {
 }
 void PairWithWiimote(int theValue) {
   if(connectedSerial) {
-    serial.write("W;"); // Send values back to application
+    serial.write("CW;"); // Pair with Wiimote
     println("Pair with Wiimote");
     delay(10);
   } else
@@ -391,9 +391,9 @@ void Connect(int value) {
       serial.bufferUntil('\n');
       connectedSerial = true;
       delay(100);
-      serial.write("GP;"); // Go
+      serial.write("GP;"); // Get PID values
       delay(10);
-      serial.write("GB;"); // Request graph data
+      serial.write("IB;"); // Get IMU Data
     }
   } else if(portNumber == -1)
     println("Select COM Port first!");
@@ -402,6 +402,7 @@ void Connect(int value) {
 }
 void Disconnect(int value) {    
   try {
+    serial.write("IS;"); // Stop sending IMU values
     serial.stop();
     serial.clear(); // Empty the buffer
     connectedSerial = false;
