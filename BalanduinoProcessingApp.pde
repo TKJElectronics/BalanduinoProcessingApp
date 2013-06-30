@@ -4,6 +4,10 @@ import java.awt.event.*;
 
 ControlP5 controlP5;
 
+PFont font10;
+PFont font25;
+PFont font30;
+
 Textfield P;
 Textfield I;
 Textfield D;
@@ -46,8 +50,10 @@ void setup() {
   controlP5 = new ControlP5(this);
   size(937, 330);
   
-  textFont(loadFont("EuphemiaUCAS-Bold-30.vlw"), 30);
-
+  font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
+  font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
+  font30 = loadFont("EuphemiaUCAS-Bold-30.vlw");
+  
   /* For remote control */
   controlP5.addButton("up")
            .setPosition(337/2-20, 70)
@@ -155,19 +161,22 @@ void draw() {
   stroke(0);
   rect(0, 0, 337, height);
   fill(0, 102, 153);
-  textSize(25); 
-  textAlign(CENTER); 
+  textSize(25);
+  textFont(font25);
+  textAlign(CENTER);
   text("Press buttons to steer", 337/2, 55);
 
   /* Set PID value etc. */
   fill(0, 102, 153);
-  textSize(30); 
-  textAlign(CENTER); 
+  textSize(30);
+  textFont(font30);
+  textAlign(CENTER);
   text("Set PID Values:", 337/2, 155);
   text("Current PID Values:", 337/2, 250);
 
   fill(255, 255, 255);
-  textSize(10);  
+  textSize(10);
+  textFont(font10);
   textAlign(LEFT);
   text("P: " + stringP + " I: " + stringI +  " D: " + stringD + " TargetAngle: " + stringTargetAngle, 10, height-50);
 
