@@ -18,6 +18,12 @@ String stringI = "";
 String stringD = "";
 String stringTargetAngle = "";
 
+String firmwareVer = "";
+String mcu = "";
+String voltage = "";
+String minutes = "";
+String seconds = "";
+
 final boolean useDropDownLists = true; // Set if you want to use the dropdownlist or not
 byte defaultComPort = 0;
 
@@ -48,7 +54,7 @@ boolean drawValues; // This is set to true whenever there is any new data
 
 void setup() {
   controlP5 = new ControlP5(this);
-  size(937, 330);
+  size(937, 370);
   
   font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
   font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
@@ -100,7 +106,7 @@ void setup() {
                          .setInputFilter(ControlP5.FLOAT)
                          .setAutoClear(false)
                          .clear();
-
+                         
   controlP5.addButton("submit")
            .setPosition(202, 165)
            .setSize(60, 20);
@@ -108,31 +114,31 @@ void setup() {
   controlP5.addButton("clear")
            .setPosition(267, 165)
            .setSize(60, 20);
-
+           
   controlP5.addButton("abort")
-           .setPosition(10, 300)
+           .setPosition(10, 340)
            .setSize(40, 20);
            
   controlP5.addButton("continueAbort") // We have to call it something else, as continue is protected
-           .setPosition(55, 300)
+           .setPosition(55, 340)
            .setSize(50, 20)
            .setCaptionLabel("continue");
            
   controlP5.addButton("storeValues")
-           .setPosition(175, 300)
+           .setPosition(175, 340)
            .setSize(65, 20)
            .setCaptionLabel("Store values");
            
   controlP5.addButton("pairWithWiimote")
-           .setPosition(245, 275)
+           .setPosition(245, 315)
            .setSize(82, 20)
            .setCaptionLabel("Pair with Wiimote");
            
   controlP5.addButton("restoreDefaults")
-           .setPosition(245, 300)
+           .setPosition(245, 340)
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
-  
+           
   for (int i=0;i<acc.length;i++) { // center all variables    
     acc[i] = height/2;
     gyro[i] = height/2;
@@ -178,7 +184,14 @@ void draw() {
   textSize(10);
   textFont(font10);
   textAlign(LEFT);
-  text("P: " + stringP + " I: " + stringI +  " D: " + stringD + " TargetAngle: " + stringTargetAngle, 10, height-50);
+  text("P: " + stringP + " I: " + stringI +  " D: " + stringD + " TargetAngle: " + stringTargetAngle, 10, 280);
+  text("Firmware: " + firmwareVer + " MCU: " + mcu, 10, 300);
+  String runtime;
+  if (!minutes.isEmpty() && !seconds.isEmpty())
+    runtime =  minutes + " min " + seconds + " sec";
+  else
+    runtime = "";
+  text("Battery level: " + voltage + " Runtime: " + runtime, 10, 320);
 
   if (sendData) { // Data is send as x,y-coordinates
     if (upPressed) {
@@ -240,17 +253,15 @@ void submit() {
     }
     if (!D.getText().equals(stringD)) {
       println("Send D value");
-      String output = "SD," + D.getText() + ';';
-      serial.write(output);
+      serial.write("SD," + D.getText() + ';');
       delay(10);
     }
     if (!targetAngle.getText().equals(stringTargetAngle)) {
       println("Send target angle");
       serial.write("ST," + targetAngle.getText() + ';');
       delay(10);
-    }  
+    }
     serial.write("GP;"); // Get PID values
-    delay(10);
   } else
     println("Establish a serial connection first!");
 }
@@ -295,7 +306,7 @@ void serialEvent(Serial serial) {
     print("Number: " + i + " Input: " + input[i] + " ");
   println();*/
 
-  if (input[0].equals("P") && input.length == 5) {
+  if (input[0].equals("P") && input.length == 5) { // PID values
     stringP = input[1];
     stringI = input[2];
     stringD = input[3];
@@ -310,8 +321,14 @@ void serialEvent(Serial serial) {
       D.setText(stringD);
     if (targetAngle.getText().isEmpty())
       targetAngle.setText(stringTargetAngle);
-  }
-  if (input[0].equals("V") && input.length == 4) {
+  } else if (input[0].equals("I") && input.length == 5) { // Info
+    firmwareVer = input[1];
+    mcu  = input[2];
+    voltage  = input[3];
+    String runtime = input[4];
+    minutes = str((int)floor(float(runtime)));
+    seconds = str((int)(float(runtime)%1/(1.0/60.0)));
+  } else if (input[0].equals("V") && input.length == 4) { // IMU data
     stringAcc = input[1];
     stringGyro = input[2];
     stringKalman = input[3];
@@ -429,6 +446,8 @@ void connect() {
       connectedSerial = true;
       delay(100);
       serial.write("GP;"); // Get PID values
+      delay(10);
+      serial.write("GI;"); // Get info
       delay(10);
       serial.write("IB;"); // Get IMU Data
     }
