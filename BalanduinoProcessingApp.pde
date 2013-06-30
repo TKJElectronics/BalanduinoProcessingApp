@@ -241,22 +241,22 @@ void submit() {
   if (connectedSerial) {    
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
     
-    if (!P.getText().equals(stringP)) {
+    if (!P.getText().equals(stringP) && !P.getText().isEmpty()) {
       println("Send P value");
       serial.write("SP," + P.getText() + ';');
       delay(10);
     }
-    if (!I.getText().equals(stringI)) {
+    if (!I.getText().equals(stringI) && !I.getText().isEmpty()) {
       println("Send I value");
       serial.write("SI," + I.getText() + ';');
       delay(10);
     }
-    if (!D.getText().equals(stringD)) {
+    if (!D.getText().equals(stringD) && !D.getText().isEmpty()) {
       println("Send D value");
       serial.write("SD," + D.getText() + ';');
       delay(10);
     }
-    if (!targetAngle.getText().equals(stringTargetAngle)) {
+    if (!targetAngle.getText().equals(stringTargetAngle) && !targetAngle.getText().isEmpty()) {
       println("Send target angle");
       serial.write("ST," + targetAngle.getText() + ';');
       delay(10);
