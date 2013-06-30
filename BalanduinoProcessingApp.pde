@@ -127,9 +127,9 @@ void setup() {
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
   
-  for (int i=0;i<gyro.length;i++) { // center all variables    
+  for (int i=0;i<acc.length;i++) { // center all variables    
+    acc[i] = height/2;
     gyro[i] = height/2;
-    acc[i] = height/2; 
     kalman[i] = height/2;
   }
 
@@ -280,29 +280,17 @@ void storeValues() {
 }
 void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
-  //for (int i = 0; i<input.length;i++) // Uncomment for debugging
-    //println("Number: " + i + " Input: " + input[i]);
+  
+  /*print("Length: " + input.length + " "); // Uncomment for debugging
+  for (int i = 0; i<input.length;i++)
+    print("Number: " + i + " Input: " + input[i] + " ");
+  println();*/
 
-  if (input[0].equals("P")) {    
-    if (input[1].length() > 5)
-      stringP = input[1].substring(0, 5);
-    else
-      stringP = input[1];
-      
-    if (input[2].length() > 5)
-      stringI = input[2].substring(0, 5);
-    else
-      stringI = input[2];
-      
-    if (input[3].length() > 5)
-      stringD = input[3].substring(0, 5);
-    else
-      stringD = input[3];
-      
-    if (input[4].length() > 6)
-      stringTargetAngle = input[4].substring(0, 6);
-    else
-      stringTargetAngle = input[4];
+  if (input[0].equals("P") && input.length == 5) {
+    stringP = input[1];
+    stringI = input[2];
+    stringD = input[3];
+    stringTargetAngle = input[4];
     
     // Set the text fields if they are empty
     if (P.getText().isEmpty())
@@ -314,7 +302,7 @@ void serialEvent(Serial serial) {
     if (targetAngle.getText().isEmpty())
       targetAngle.setText(stringTargetAngle);
   }
-  if (input[0].equals("V")) {
+  if (input[0].equals("V") && input.length == 4) {
     stringAcc = input[1];
     stringGyro = input[2];
     stringKalman = input[3];
