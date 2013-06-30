@@ -1,5 +1,7 @@
 import processing.serial.*;  
 import controlP5.*;
+import java.awt.event.*;
+
 ControlP5 controlP5;
 
 Textfield P;
@@ -50,10 +52,18 @@ void setup() {
   textFont(f, 30);
 
   /* For remote control */
-  controlP5.addButton("Up", 0, 337/2-20, 70, 40, 20);
-  controlP5.addButton("Down", 0, 337/2-20, 92, 40, 20);
-  controlP5.addButton("Left", 0, 337/2-62, 92, 40, 20);
-  controlP5.addButton("Right", 0, 337/2+22, 92, 40, 20);  
+  controlP5.addButton("Up")
+           .setPosition(337/2-20, 70)
+           .setSize(40, 20);
+  controlP5.addButton("Down")
+           .setPosition(337/2-20, 92)
+           .setSize(40, 20);
+  controlP5.addButton("Left")
+           .setPosition(337/2-62, 92)
+           .setSize(40, 20);
+  controlP5.addButton("Right")
+           .setPosition(337/2+22, 92)
+           .setSize(40, 20);
 
   /* For setting the PID values etc. */
   P = controlP5.addTextfield("P", 10, 165, 35, 20);
@@ -77,17 +87,31 @@ void setup() {
   D.clear();
   targetAngle.clear();
 
-  controlP5.addButton("Submit", 0, 202, 165, 60, 20);
-  controlP5.addButton("Clear", 0, 267, 165, 60, 20);
+  controlP5.addButton("Submit")
+           .setPosition(202, 165)
+           .setSize(60, 20);
+  controlP5.addButton("Clear")
+           .setPosition(267, 165)
+           .setSize(60, 20);
 
-  controlP5.addButton("Abort", 0, 10, 300, 40, 20);
-  controlP5.addButton("Continue", 0, 55, 300, 50, 20);
-  Button b = controlP5.addButton("StoreValues", 0, 175, 300, 65, 20);
-  b.captionLabel().set("Store values");
-  b = controlP5.addButton("PairWithWiimote", 0, 245, 275, 82, 20);
-  b.captionLabel().set("Pair with Wiimote");
-  b = controlP5.addButton("RestoreDefaults", 0, 245, 300, 82, 20);
-  b.captionLabel().set("Restore defaults");
+  controlP5.addButton("Abort")
+           .setPosition(10, 300)
+           .setSize(40, 20);
+  controlP5.addButton("Continue")
+           .setPosition(55, 300)
+           .setSize(50, 20);
+  controlP5.addButton("StoreValues")
+           .setPosition(175, 300)
+           .setSize(65, 20)
+           .setCaptionLabel("Store values");
+  controlP5.addButton("PairWithWiimote")
+           .setPosition(245, 275)
+           .setSize(82, 20)
+           .setCaptionLabel("Pair with Wiimote");
+  controlP5.addButton("RestoreDefaults")
+           .setPosition(245, 300)
+           .setSize(82, 20)
+           .setCaptionLabel("Restore defaults");
   
   for (int i=0;i<gyro.length;i++) { // center all variables    
     gyro[i] = height/2;
@@ -372,8 +396,8 @@ void keyReleased() {
 }
 void controlEvent(ControlEvent theEvent) {
   if(theEvent.isGroup()) {
-    if(theEvent.group().name() == "COMPort")
-      portNumber = int(theEvent.group().value()); //Since the list returns a float, we need to convert it to an int. For that we us the int() function.
+    if(theEvent.getGroup().getName() == "COMPort")
+      portNumber = int(theEvent.getGroup().getValue()); //Since the list returns a float, we need to convert it to an int. For that we us the int() function.
   }
 }
 void Connect(int value) {     
