@@ -1,4 +1,9 @@
 void initDropdownlist() {
+  addMouseWheelListener(new MouseWheelListener() { // Add a mousewheel listener to scroll the dropdown list
+    public void mouseWheelMoved(MouseWheelEvent mwe) { 
+      mouseWheel(mwe.getWheelRotation());
+  }});
+  
   COMports = controlP5.addDropdownList("COMPort") // Make a dropdown list with all serial ports                      
                       .setPosition(10, 20)
                       .setSize(210, 200)
@@ -34,3 +39,6 @@ void customize(DropdownList ddl) {
   }
 }
 
+void mouseWheel(int delta) {
+  COMports.scroll(delta > 0 ? 1 : 0); // Scroll the dropdownlist using the mousewheel
+}
