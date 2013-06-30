@@ -303,6 +303,16 @@ void serialEvent(Serial serial) {
       stringTargetAngle = input[4].substring(0, 6);
     else
       stringTargetAngle = input[4];
+    
+    // Set the text fields if they are empty
+    if (P.getText().isEmpty())
+      P.setText(stringP);
+    if (I.getText().isEmpty())
+      I.setText(stringI);
+    if (D.getText().isEmpty())
+      D.setText(stringD);
+    if (targetAngle.getText().isEmpty())
+      targetAngle.setText(stringTargetAngle);
   }
   if (input[0].equals("V")) {
     stringAcc = input[1];
