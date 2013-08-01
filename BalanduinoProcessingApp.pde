@@ -324,7 +324,7 @@ void serialEvent(Serial serial) {
   } else if (input[0].equals("I") && input.length == 5) { // Info
     firmwareVer = input[1];
     mcu  = input[2];
-    voltage  = input[3];
+    voltage  = input[3] + 'V';
     String runtime = input[4];
     minutes = str((int)floor(float(runtime)));
     seconds = str((int)(float(runtime)%1/(1.0/60.0)));
