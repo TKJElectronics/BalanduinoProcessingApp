@@ -39,6 +39,7 @@ String stringD = "";
 String stringTargetAngle = "";
 
 String firmwareVer = "";
+String eepromVer = "";
 String mcu = "";
 String voltage = "";
 String minutes = "";
@@ -205,7 +206,7 @@ public void draw() {
   textFont(font10);
   textAlign(LEFT);
   text("P: " + stringP + " I: " + stringI +  " D: " + stringD + " TargetAngle: " + stringTargetAngle, 10, 280);
-  text("Firmware: " + firmwareVer + " MCU: " + mcu, 10, 300);
+  text("Firmware: " + firmwareVer + " EEPROM: " + eepromVer + " MCU: " + mcu, 10, 300);
   String runtime;
   if (!minutes.isEmpty() && !seconds.isEmpty())
     runtime =  minutes + " min " + seconds + " sec";
@@ -341,11 +342,13 @@ public void serialEvent(Serial serial) {
       D.setText(stringD);
     if (targetAngle.getText().isEmpty())
       targetAngle.setText(stringTargetAngle);
-  } else if (input[0].equals("I") && input.length == 5) { // Info
+  } else if (input[0].equals("I") && input.length == 4) { // Info
     firmwareVer = input[1];
-    mcu  = input[2];
-    voltage  = input[3];
-    String runtime = input[4];
+    eepromVer = input[2];
+    mcu  = input[3];
+  } else if (input[0].equals("R") && input.length == 3) { // Status response
+    voltage  = input[1] + 'V';
+    String runtime = input[2];
     minutes = str((int)floor(PApplet.parseFloat(runtime)));
     seconds = str((int)(PApplet.parseFloat(runtime)%1/(1.0f/60.0f)));
   } else if (input[0].equals("V") && input.length == 4) { // IMU data
@@ -463,13 +466,15 @@ public void connect() {
     }  
     if (serial != null) {      
       serial.bufferUntil('\n');
-      connectedSerial = true;
-      delay(100);
+      connectedSerial = true; 
+      delay(3000); // Wait bit - needed for the standard serial connection, as it resets the board
       serial.write("GP;"); // Get PID values
       delay(10);
       serial.write("GI;"); // Get info
       delay(10);
-      serial.write("IB;"); // Get IMU Data
+      serial.write("IB;"); // Start sending IMU values
+      delay(10);
+      serial.write("RB;"); // Start sending status report
     }
   } else if (portNumber == -1)
     println("Select COM Port first!");
@@ -480,6 +485,9 @@ public void connect() {
 public void disconnect() {    
   try {
     serial.write("IS;"); // Stop sending IMU values
+    delay(10);
+    serial.write("RS;"); // Stop sending status report
+    delay(500);
     serial.stop();
     serial.clear(); // Empty the buffer
     connectedSerial = false;
