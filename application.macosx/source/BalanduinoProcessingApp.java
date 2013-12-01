@@ -18,53 +18,30 @@ import java.io.IOException;
 
 public class BalanduinoProcessingApp extends PApplet {
 
-  
+
 
 
 
 ControlP5 controlP5;
 
-PFont font10;
-PFont font25;
-PFont font30;
-
-Textfield P;
-Textfield I;
-Textfield D;
-Textfield targetAngle;
-
-String stringP = "";
-String stringI = "";
-String stringD = "";
-String stringTargetAngle = "";
-
-String firmwareVer = "";
-String eepromVer = "";
-String mcu = "";
-String voltage = "";
-String minutes = "";
-String seconds = "";
+PFont font10, font25, font30;
+Textfield P, I, D, targetAngle;
+String stringP = "", stringI = "", stringD = "", stringTargetAngle = "";
+String firmwareVer = "", eepromVer = "", mcu = "", voltage = "", minutes = "", seconds = "";
 
 final boolean useDropDownLists = true; // Set if you want to use the dropdownlist or not
-byte defaultComPort = 0;
+byte defaultComPort = 0; // You should change this as well if you do not want to use the dropdownlist
 
 // Dropdown list
 DropdownList dropdownList; // Define the variable ports as a Dropdownlist.
 Serial serial; // Define the variable port as a Serial object.
 int portNumber = -1; // The dropdown list will return a float value, which we will connvert into an int. We will use this int for that.
 
-boolean connectedSerial;
-boolean aborted;
+boolean connectedSerial, aborted;
 
-boolean upPressed;
-boolean downPressed;
-boolean leftPressed;
-boolean rightPressed;
-boolean sendData;
+boolean upPressed, downPressed, leftPressed, rightPressed, sendData;
 
-String stringGyro;
-String stringAcc;
-String stringKalman;
+String stringGyro, stringAcc, stringKalman;
 
 // We will store 101 readings
 float[] acc = new float[101];
@@ -76,28 +53,28 @@ boolean drawValues; // This is set to true whenever there is any new data
 public void setup() {
   controlP5 = new ControlP5(this);
   size(937, 370);
-  
+
   font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
   font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
   font30 = loadFont("EuphemiaUCAS-Bold-30.vlw");
-  
+
   /* For remote control */
   controlP5.addButton("up")
            .setPosition(337/2-20, 70)
            .setSize(40, 20);
-           
+
   controlP5.addButton("down")
            .setPosition(337/2-20, 92)
            .setSize(40, 20);
-           
+
   controlP5.addButton("left")
            .setPosition(337/2-62, 92)
            .setSize(40, 20);
-           
+
   controlP5.addButton("right")
            .setPosition(337/2+22, 92)
            .setSize(40, 20);
-           
+
   /* For setting the PID values etc. */
   P = controlP5.addTextfield("P")
                .setPosition(10, 165)
@@ -106,61 +83,61 @@ public void setup() {
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   I = controlP5.addTextfield("I")
                .setPosition(50, 165)
                .setSize(35, 20)
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   D = controlP5.addTextfield("D")
                .setPosition(90, 165)
                .setSize(35, 20)
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   targetAngle = controlP5.addTextfield("targetAngle")
                          .setPosition(130, 165)
                          .setSize(35, 20)
                          .setInputFilter(ControlP5.FLOAT)
                          .setAutoClear(false)
                          .clear();
-                         
+
   controlP5.addButton("submit")
            .setPosition(202, 165)
            .setSize(60, 20);
-           
+
   controlP5.addButton("clear")
            .setPosition(267, 165)
            .setSize(60, 20);
-           
+
   controlP5.addButton("abort")
            .setPosition(10, 340)
            .setSize(40, 20);
-           
+
   controlP5.addButton("continueAbort") // We have to call it something else, as continue is protected
            .setPosition(55, 340)
            .setSize(50, 20)
            .setCaptionLabel("continue");
-           
+
   controlP5.addButton("storeValues")
            .setPosition(175, 340)
            .setSize(65, 20)
            .setCaptionLabel("Store values");
-           
+
   controlP5.addButton("pairWithWiimote")
            .setPosition(245, 315)
            .setSize(82, 20)
            .setCaptionLabel("Pair with Wiimote");
-           
+
   controlP5.addButton("restoreDefaults")
            .setPosition(245, 340)
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
-           
-  for (int i=0;i<acc.length;i++) { // center all variables    
+
+  for (int i=0;i<acc.length;i++) { // center all variables
     acc[i] = height/2;
     gyro[i] = height/2;
     kalman[i] = height/2;
@@ -230,7 +207,7 @@ public void draw() {
         serial.write("CJ,0.7,-0.7;"); // Backward right
       else
         serial.write("CJ,0,-0.7;"); // Backward
-    } 
+    }
     else if (leftPressed)
       serial.write("CJ,-0.7,0;"); // Left
     else if (rightPressed)
@@ -259,9 +236,9 @@ public void continueAbort() {
     println("Establish a serial connection first!");
 }
 public void submit() {
-  if (connectedSerial) {    
+  if (connectedSerial) {
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
-    
+
     if (!P.getText().equals(stringP) && !P.getText().isEmpty()) {
       println("Send P value");
       serial.write("SP," + P.getText() + ';');
@@ -321,7 +298,7 @@ public void storeValues() {
 }
 public void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
-  
+
   /*print("Length: " + input.length + " "); // Uncomment for debugging
   for (int i = 0; i<input.length;i++)
     print("Number: " + i + " Input: " + input[i] + " ");
@@ -332,7 +309,7 @@ public void serialEvent(Serial serial) {
     stringI = input[2];
     stringD = input[3];
     stringTargetAngle = input[4];
-    
+
     // Set the text fields if they are empty
     if (P.getText().isEmpty())
       P.setText(stringP);
@@ -355,7 +332,7 @@ public void serialEvent(Serial serial) {
     stringAcc = input[1];
     stringGyro = input[2];
     stringKalman = input[3];
-    
+
     /*print(stringAcc);
     print(stringGyro);
     print(stringKalman);*/
@@ -392,13 +369,13 @@ public void keyPressed() {
     if (aborted)
       continueAbort();
     else
-      abort();      
+      abort();
     key = 0; // Disable Processing from quiting when pressing ESC
-  } else if (key == CODED) { 
+  } else if (key == CODED) {
     if (connectedSerial) {
-      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
-          if (keyCode == LEFT) {  
+      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
+        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
+          if (keyCode == LEFT) {
             leftPressed = true;
             println("Left pressed");
           }
@@ -423,8 +400,8 @@ public void keyPressed() {
 }
 public void keyReleased() {
   if (connectedSerial) {
-    if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
+    if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
+      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
         if (keyCode == LEFT) {
           leftPressed = false;
           println("Left released");
@@ -453,27 +430,28 @@ public void controlEvent(ControlEvent theEvent) {
       portNumber = PApplet.parseInt(theEvent.getGroup().getValue()); // Since the list returns a float, we need to convert it to an int. For that we us the int() function
   }
 }
-public void connect() {     
+public void connect() {
   if (connectedSerial) // Disconnect existing connection
     disconnect();
   if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
-    println("ConnectSerial");    
+    println("ConnectSerial");
+    dropdownList.close();
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
       //e.printStackTrace();
       println("Couldn't open serial port");
-    }  
-    if (serial != null) {      
+    }
+    if (serial != null) {
       serial.bufferUntil('\n');
-      connectedSerial = true; 
+      connectedSerial = true;
       delay(3000); // Wait bit - needed for the standard serial connection, as it resets the board
       serial.write("GP;"); // Get PID values
-      delay(10);
+      delay(50);
       serial.write("GI;"); // Get info
-      delay(10);
+      delay(50);
       serial.write("IB;"); // Start sending IMU values
-      delay(10);
+      delay(50);
       serial.write("RB;"); // Start sending status report
     }
   } else if (portNumber == -1)
@@ -482,7 +460,7 @@ public void connect() {
     println("Already connected to a port!");
 }
 
-public void disconnect() {    
+public void disconnect() {
   try {
     serial.write("IS;"); // Stop sending IMU values
     delay(10);
@@ -497,82 +475,81 @@ public void disconnect() {
     println("Couldn't disconnect serial port");
   }
 }
-final int maxAngle = 360;
-final int minAngle = 0;
+final int minAngle = 0, maxAngle = 360;
 
 public void drawGraph() {
   background(255); // Set background to white
-  
+
+  stroke(200); // Grey
   for (int i = 0;i<gyro.length;i++) { // Draw graph paper
-    stroke(200); // Grey
     line(337+i*10, 0, 337+i*10, height);
     line(337, i*10, 337+width, i*10);
   }
-  
+
   stroke(0); // Black
   for (int i = 1; i <= 3; i++)
     line(337, height/4*i, width, height/4*i); // Draw lines indicating 90 deg, 180 deg, and 270 deg
-  
+
   if (stringGyro != null)
     gyro[gyro.length-1] = map(PApplet.parseFloat(trim(stringGyro)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringAcc != null)
     acc[acc.length-1] = map(PApplet.parseFloat(trim(stringAcc)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringKalman != null)
     kalman[kalman.length-1] = map(PApplet.parseFloat(trim(stringKalman)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
-  
+
   noFill();
-  
+
   // Draw acceleromter x-axis
   stroke(255,0,0); // Red
   beginShape();
   for (int i = 0; i<acc.length;i++)
     vertex(i*6+337,height-acc[i]);
   endShape();
-  
+
   // Draw gyro x-axis
   stroke(0,255,0); // Green
   beginShape();
   for (int i = 0; i<gyro.length;i++)
     vertex(i*6+337,height-gyro[i]);
   endShape();
-  
+
   // Draw kalman filter x-axis
   stroke(0,0,255); // Blue
   beginShape();
   for (int i = 0; i<kalman.length;i++)
     vertex(i*6+337,height-kalman[i]);
   endShape();
-  
+
   for (int i = 1; i<acc.length;i++) { // Put all data one array back
     acc[i-1] = acc[i];
     gyro[i-1] = gyro[i];
     kalman[i-1] = kalman[i];
   }
 }
-public void initDropdownlist() {  
+public void initDropdownlist() {
   dropdownList = controlP5.addDropdownList("SerialPort"); // Make a dropdown list with all serial ports
-  
+
   dropdownList.setPosition(10, 20);
   dropdownList.setSize(210, 200);
   dropdownList.setCaptionLabel("Select serial port"); // Set the lable of the bar when nothing is selected
-  
+
   dropdownList.setBackgroundColor(color(200)); // Set the background color of the line between values
   dropdownList.setItemHeight(20); // Set the height of each item when the list is opened
   dropdownList.setBarHeight(15); // Set the height of the bar itself
-  
+
   dropdownList.getCaptionLabel().getStyle().marginTop = 3; // Set the top margin of the lable
   dropdownList.getCaptionLabel().getStyle().marginLeft = 3; // Set the left margin of the lable
-  
+
   dropdownList.setColorBackground(color(60));
   dropdownList.setColorActive(color(255, 128));
-  
+
   // Now well add the ports to the list, we use a for loop for that
   for (int i=0; i<Serial.list().length; i++) {
     dropdownList.addItem(Serial.list()[i], i); // This is the line doing the actual adding of items, we use the current loop we are in to determine what place in the char array to access and what item number to add it as
     if (Serial.list()[i].indexOf("Balanduino") != -1 && dropdownList.getValue() == 0) // Check for the "Balanduino" substring and make sure it is not already set
       dropdownList.setValue(i); // Automaticly select the Balanduino balancing robot on Mac OS X and Linux
   }
-  
+
   addMouseWheelListener(new MouseWheelListener() { // Add a mousewheel listener to scroll the dropdown list
     public void mouseWheelMoved(MouseWheelEvent mwe) {
       dropdownList.scroll(mwe.getWheelRotation() > 0 ? 1 : 0); // Scroll the dropdownlist using the mousewheel
@@ -581,7 +558,7 @@ public void initDropdownlist() {
   controlP5.addButton("connect")
            .setPosition(225, 3)
            .setSize(45, 15);
-           
+
   controlP5.addButton("disconnect")
            .setPosition(275, 3)
            .setSize(52, 15);

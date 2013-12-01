@@ -1,50 +1,27 @@
-import processing.serial.*;  
+import processing.serial.*;
 import controlP5.*;
 import java.awt.event.*;
 
 ControlP5 controlP5;
 
-PFont font10;
-PFont font25;
-PFont font30;
-
-Textfield P;
-Textfield I;
-Textfield D;
-Textfield targetAngle;
-
-String stringP = "";
-String stringI = "";
-String stringD = "";
-String stringTargetAngle = "";
-
-String firmwareVer = "";
-String eepromVer = "";
-String mcu = "";
-String voltage = "";
-String minutes = "";
-String seconds = "";
+PFont font10, font25, font30;
+Textfield P, I, D, targetAngle;
+String stringP = "", stringI = "", stringD = "", stringTargetAngle = "";
+String firmwareVer = "", eepromVer = "", mcu = "", voltage = "", minutes = "", seconds = "";
 
 final boolean useDropDownLists = true; // Set if you want to use the dropdownlist or not
-byte defaultComPort = 0;
+byte defaultComPort = 0; // You should change this as well if you do not want to use the dropdownlist
 
 // Dropdown list
 DropdownList dropdownList; // Define the variable ports as a Dropdownlist.
 Serial serial; // Define the variable port as a Serial object.
 int portNumber = -1; // The dropdown list will return a float value, which we will connvert into an int. We will use this int for that.
 
-boolean connectedSerial;
-boolean aborted;
+boolean connectedSerial, aborted;
 
-boolean upPressed;
-boolean downPressed;
-boolean leftPressed;
-boolean rightPressed;
-boolean sendData;
+boolean upPressed, downPressed, leftPressed, rightPressed, sendData;
 
-String stringGyro;
-String stringAcc;
-String stringKalman;
+String stringGyro, stringAcc, stringKalman;
 
 // We will store 101 readings
 float[] acc = new float[101];
@@ -56,28 +33,28 @@ boolean drawValues; // This is set to true whenever there is any new data
 void setup() {
   controlP5 = new ControlP5(this);
   size(937, 370);
-  
+
   font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
   font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
   font30 = loadFont("EuphemiaUCAS-Bold-30.vlw");
-  
+
   /* For remote control */
   controlP5.addButton("up")
            .setPosition(337/2-20, 70)
            .setSize(40, 20);
-           
+
   controlP5.addButton("down")
            .setPosition(337/2-20, 92)
            .setSize(40, 20);
-           
+
   controlP5.addButton("left")
            .setPosition(337/2-62, 92)
            .setSize(40, 20);
-           
+
   controlP5.addButton("right")
            .setPosition(337/2+22, 92)
            .setSize(40, 20);
-           
+
   /* For setting the PID values etc. */
   P = controlP5.addTextfield("P")
                .setPosition(10, 165)
@@ -86,61 +63,61 @@ void setup() {
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   I = controlP5.addTextfield("I")
                .setPosition(50, 165)
                .setSize(35, 20)
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   D = controlP5.addTextfield("D")
                .setPosition(90, 165)
                .setSize(35, 20)
                .setInputFilter(ControlP5.FLOAT)
                .setAutoClear(false)
                .clear();
-               
+
   targetAngle = controlP5.addTextfield("targetAngle")
                          .setPosition(130, 165)
                          .setSize(35, 20)
                          .setInputFilter(ControlP5.FLOAT)
                          .setAutoClear(false)
                          .clear();
-                         
+
   controlP5.addButton("submit")
            .setPosition(202, 165)
            .setSize(60, 20);
-           
+
   controlP5.addButton("clear")
            .setPosition(267, 165)
            .setSize(60, 20);
-           
+
   controlP5.addButton("abort")
            .setPosition(10, 340)
            .setSize(40, 20);
-           
+
   controlP5.addButton("continueAbort") // We have to call it something else, as continue is protected
            .setPosition(55, 340)
            .setSize(50, 20)
            .setCaptionLabel("continue");
-           
+
   controlP5.addButton("storeValues")
            .setPosition(175, 340)
            .setSize(65, 20)
            .setCaptionLabel("Store values");
-           
+
   controlP5.addButton("pairWithWiimote")
            .setPosition(245, 315)
            .setSize(82, 20)
            .setCaptionLabel("Pair with Wiimote");
-           
+
   controlP5.addButton("restoreDefaults")
            .setPosition(245, 340)
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
-           
-  for (int i=0;i<acc.length;i++) { // center all variables    
+
+  for (int i=0;i<acc.length;i++) { // center all variables
     acc[i] = height/2;
     gyro[i] = height/2;
     kalman[i] = height/2;
@@ -210,7 +187,7 @@ void draw() {
         serial.write("CJ,0.7,-0.7;"); // Backward right
       else
         serial.write("CJ,0,-0.7;"); // Backward
-    } 
+    }
     else if (leftPressed)
       serial.write("CJ,-0.7,0;"); // Left
     else if (rightPressed)
@@ -239,9 +216,9 @@ void continueAbort() {
     println("Establish a serial connection first!");
 }
 void submit() {
-  if (connectedSerial) {    
+  if (connectedSerial) {
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
-    
+
     if (!P.getText().equals(stringP) && !P.getText().isEmpty()) {
       println("Send P value");
       serial.write("SP," + P.getText() + ';');
@@ -301,7 +278,7 @@ void storeValues() {
 }
 void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
-  
+
   /*print("Length: " + input.length + " "); // Uncomment for debugging
   for (int i = 0; i<input.length;i++)
     print("Number: " + i + " Input: " + input[i] + " ");
@@ -312,7 +289,7 @@ void serialEvent(Serial serial) {
     stringI = input[2];
     stringD = input[3];
     stringTargetAngle = input[4];
-    
+
     // Set the text fields if they are empty
     if (P.getText().isEmpty())
       P.setText(stringP);
@@ -335,7 +312,7 @@ void serialEvent(Serial serial) {
     stringAcc = input[1];
     stringGyro = input[2];
     stringKalman = input[3];
-    
+
     /*print(stringAcc);
     print(stringGyro);
     print(stringKalman);*/
@@ -372,13 +349,13 @@ void keyPressed() {
     if (aborted)
       continueAbort();
     else
-      abort();      
+      abort();
     key = 0; // Disable Processing from quiting when pressing ESC
-  } else if (key == CODED) { 
+  } else if (key == CODED) {
     if (connectedSerial) {
-      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
-          if (keyCode == LEFT) {  
+      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
+        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
+          if (keyCode == LEFT) {
             leftPressed = true;
             println("Left pressed");
           }
@@ -403,8 +380,8 @@ void keyPressed() {
 }
 void keyReleased() {
   if (connectedSerial) {
-    if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) { 
-      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {        
+    if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
+      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
         if (keyCode == LEFT) {
           leftPressed = false;
           println("Left released");
@@ -433,27 +410,28 @@ void controlEvent(ControlEvent theEvent) {
       portNumber = int(theEvent.getGroup().getValue()); // Since the list returns a float, we need to convert it to an int. For that we us the int() function
   }
 }
-void connect() {     
+void connect() {
   if (connectedSerial) // Disconnect existing connection
     disconnect();
   if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
-    println("ConnectSerial");    
+    println("ConnectSerial");
+    dropdownList.close();
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
       //e.printStackTrace();
       println("Couldn't open serial port");
-    }  
-    if (serial != null) {      
+    }
+    if (serial != null) {
       serial.bufferUntil('\n');
-      connectedSerial = true; 
+      connectedSerial = true;
       delay(3000); // Wait bit - needed for the standard serial connection, as it resets the board
       serial.write("GP;"); // Get PID values
-      delay(10);
+      delay(50);
       serial.write("GI;"); // Get info
-      delay(10);
+      delay(50);
       serial.write("IB;"); // Start sending IMU values
-      delay(10);
+      delay(50);
       serial.write("RB;"); // Start sending status report
     }
   } else if (portNumber == -1)
@@ -462,7 +440,7 @@ void connect() {
     println("Already connected to a port!");
 }
 
-void disconnect() {    
+void disconnect() {
   try {
     serial.write("IS;"); // Stop sending IMU values
     delay(10);
