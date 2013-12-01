@@ -437,7 +437,8 @@ void connect() {
   if (connectedSerial) // Disconnect existing connection
     disconnect();
   if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
-    println("ConnectSerial");    
+    println("ConnectSerial");
+    dropdownList.close();
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
