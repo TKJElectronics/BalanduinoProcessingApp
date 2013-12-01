@@ -427,11 +427,11 @@ void connect() {
       connectedSerial = true;
       delay(3000); // Wait bit - needed for the standard serial connection, as it resets the board
       serial.write("GP;"); // Get PID values
-      delay(10);
+      delay(50);
       serial.write("GI;"); // Get info
-      delay(10);
+      delay(50);
       serial.write("IB;"); // Start sending IMU values
-      delay(10);
+      delay(50);
       serial.write("RB;"); // Start sending status report
     }
   } else if (portNumber == -1)
