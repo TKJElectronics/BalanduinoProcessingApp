@@ -30,6 +30,8 @@ float[] kalman = new float[101];
 
 boolean drawValues; // This is set to true whenever there is any new data
 
+final int mainWidth = 337; // Width of the main control panel
+
 void setup() {
   controlP5 = new ControlP5(this);
   size(937, 370);
@@ -40,19 +42,19 @@ void setup() {
 
   /* For remote control */
   controlP5.addButton("up")
-           .setPosition(337 / 2 - 20, 70)
+           .setPosition(mainWidth / 2 - 20, 70)
            .setSize(40, 20);
 
   controlP5.addButton("down")
-           .setPosition(337 / 2 - 20, 92)
+           .setPosition(mainWidth / 2 - 20, 92)
            .setSize(40, 20);
 
   controlP5.addButton("left")
-           .setPosition(337 / 2 - 62, 92)
+           .setPosition(mainWidth / 2 - 62, 92)
            .setSize(40, 20);
 
   controlP5.addButton("right")
-           .setPosition(337 / 2 + 22, 92)
+           .setPosition(mainWidth / 2 + 22, 92)
            .setSize(40, 20);
 
   /* For setting the PID values etc. */
@@ -143,20 +145,20 @@ void draw() {
   /* Remote contol */
   fill(0);
   stroke(0);
-  rect(0, 0, 337, height);
+  rect(0, 0, mainWidth, height);
   fill(0, 102, 153);
   textSize(25);
   textFont(font25);
   textAlign(CENTER);
-  text("Press buttons to steer", 337 / 2, 55);
+  text("Press buttons to steer", mainWidth / 2, 55);
 
   /* Set PID value etc. */
   fill(0, 102, 153);
   textSize(30);
   textFont(font30);
   textAlign(CENTER);
-  text("Set PID Values:", 337 / 2, 155);
-  text("Current PID Values:", 337 / 2, 250);
+  text("Set PID Values:", mainWidth / 2, 155);
+  text("Current PID Values:", mainWidth / 2, 250);
 
   fill(255, 255, 255);
   textSize(10);
@@ -199,6 +201,7 @@ void draw() {
     sendData = false;
   }
 }
+
 void abort() {
   if (connectedSerial) {
     serial.write("A;");
@@ -207,6 +210,7 @@ void abort() {
   } else
     println("Establish a serial connection first!");
 }
+
 void continueAbort() {
   if (connectedSerial) {
     serial.write("C");
@@ -215,6 +219,7 @@ void continueAbort() {
   } else
     println("Establish a serial connection first!");
 }
+
 void submit() {
   if (connectedSerial) {
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
@@ -243,12 +248,14 @@ void submit() {
   } else
     println("Establish a serial connection first!");
 }
+
 void clear() {
   P.clear();
   I.clear();
   D.clear();
   targetAngle.clear();
 }
+
 void restoreDefaults() {
   if (connectedSerial) {
     serial.write("CR;"); // Restore values
@@ -257,6 +264,7 @@ void restoreDefaults() {
   } else
     println("Establish a serial connection first!");
 }
+
 void pairWithWiimote() {
   if (connectedSerial) {
     serial.write("CW;"); // Pair with Wiimote
@@ -265,6 +273,7 @@ void pairWithWiimote() {
   } else
     println("Establish a serial connection first!");
 }
+
 void storeValues() {
   // Don't set the text if the string is empty or it will throw an exception
   if (stringP != null)
@@ -276,6 +285,7 @@ void storeValues() {
   if (stringTargetAngle != null)
     targetAngle.setText(stringTargetAngle);
 }
+
 void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
 
@@ -320,6 +330,7 @@ void serialEvent(Serial serial) {
   serial.clear();  // Empty the buffer
   drawValues = true; // Draw the graph
 }
+
 void keyPressed() {
   if (key == 's' || key == 'S')
     storeValues();
@@ -378,6 +389,7 @@ void keyPressed() {
       println("Establish a serial connection first!");
   }
 }
+
 void keyReleased() {
   if (connectedSerial) {
     if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
@@ -404,12 +416,14 @@ void keyReleased() {
   } else
     println("Establish a serial connection first!");
 }
+
 void controlEvent(ControlEvent theEvent) {
   if (theEvent.isGroup()) {
     if (theEvent.getGroup().getName() == dropdownList.getName())
       portNumber = int(theEvent.getGroup().getValue()); // Since the list returns a float, we need to convert it to an int. For that we us the int() function
   }
 }
+
 void connect() {
   if (connectedSerial) // Disconnect existing connection
     disconnect();

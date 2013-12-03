@@ -1,3 +1,5 @@
 Sæt maximum angle og maximum turning value
 Back to spot
 Kalman værdier
+
+Lav cicular buffer i stedet for at flytte hele arrayet
