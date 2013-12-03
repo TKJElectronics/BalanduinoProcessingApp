@@ -16,7 +16,7 @@ void initDropdownlist() {
   dropdownList.setColorActive(color(255, 128));
 
   // Now well add the ports to the list, we use a for loop for that
-  for (int i=0; i<Serial.list().length; i++) {
+  for (int i = 0; i < Serial.list().length; i++) {
     dropdownList.addItem(Serial.list()[i], i); // This is the line doing the actual adding of items, we use the current loop we are in to determine what place in the char array to access and what item number to add it as
     if (Serial.list()[i].indexOf("Balanduino") != -1 && dropdownList.getValue() == 0) // Check for the "Balanduino" substring and make sure it is not already set
       dropdownList.setValue(i); // Automaticly select the Balanduino balancing robot on Mac OS X and Linux
@@ -25,7 +25,8 @@ void initDropdownlist() {
   addMouseWheelListener(new MouseWheelListener() { // Add a mousewheel listener to scroll the dropdown list
     public void mouseWheelMoved(MouseWheelEvent mwe) {
       dropdownList.scroll(mwe.getWheelRotation() > 0 ? 1 : 0); // Scroll the dropdownlist using the mousewheel
-  }});
+    }
+  });
 
   controlP5.addButton("connect")
            .setPosition(225, 3)

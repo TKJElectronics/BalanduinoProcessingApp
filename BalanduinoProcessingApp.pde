@@ -40,19 +40,19 @@ void setup() {
 
   /* For remote control */
   controlP5.addButton("up")
-           .setPosition(337/2-20, 70)
+           .setPosition(337 / 2 - 20, 70)
            .setSize(40, 20);
 
   controlP5.addButton("down")
-           .setPosition(337/2-20, 92)
+           .setPosition(337 / 2 - 20, 92)
            .setSize(40, 20);
 
   controlP5.addButton("left")
-           .setPosition(337/2-62, 92)
+           .setPosition(337 / 2 - 62, 92)
            .setSize(40, 20);
 
   controlP5.addButton("right")
-           .setPosition(337/2+22, 92)
+           .setPosition(337 / 2 + 22, 92)
            .setSize(40, 20);
 
   /* For setting the PID values etc. */
@@ -117,10 +117,10 @@ void setup() {
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
 
-  for (int i=0;i<acc.length;i++) { // center all variables
-    acc[i] = height/2;
-    gyro[i] = height/2;
-    kalman[i] = height/2;
+  for (int i = 0; i < acc.length; i++) { // center all variables
+    acc[i] = height / 2;
+    gyro[i] = height / 2;
+    kalman[i] = height / 2;
   }
 
   //println(Serial.list()); // Used for debugging
@@ -148,15 +148,15 @@ void draw() {
   textSize(25);
   textFont(font25);
   textAlign(CENTER);
-  text("Press buttons to steer", 337/2, 55);
+  text("Press buttons to steer", 337 / 2, 55);
 
   /* Set PID value etc. */
   fill(0, 102, 153);
   textSize(30);
   textFont(font30);
   textAlign(CENTER);
-  text("Set PID Values:", 337/2, 155);
-  text("Current PID Values:", 337/2, 250);
+  text("Set PID Values:", 337 / 2, 155);
+  text("Current PID Values:", 337 / 2, 250);
 
   fill(255, 255, 255);
   textSize(10);
@@ -307,7 +307,7 @@ void serialEvent(Serial serial) {
     voltage  = input[1] + 'V';
     String runtime = input[2];
     minutes = str((int)floor(float(runtime)));
-    seconds = str((int)(float(runtime)%1/(1.0/60.0)));
+    seconds = str((int)(float(runtime) % 1 / (1.0 / 60.0)));
   } else if (input[0].equals("V") && input.length == 4) { // IMU data
     stringAcc = input[1];
     stringGyro = input[2];
