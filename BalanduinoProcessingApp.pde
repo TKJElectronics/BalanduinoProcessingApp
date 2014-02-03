@@ -109,6 +109,11 @@ void setup() {
            .setSize(65, 20)
            .setCaptionLabel("Store values");
 
+  controlP5.addButton("pairWithPS4")
+           .setPosition(245, 290)
+           .setSize(82, 20)
+           .setCaptionLabel("Pair with PS4");
+
   controlP5.addButton("pairWithWiimote")
            .setPosition(245, 315)
            .setSize(82, 20)
@@ -265,9 +270,18 @@ void restoreDefaults() {
     println("Establish a serial connection first!");
 }
 
+void pairWithPS4() {
+  if (connectedSerial) {
+    serial.write("CPP;"); // Pair with PS4
+    println("Pair with PS4 controller");
+    delay(10);
+  } else
+    println("Establish a serial connection first!");
+}
+
 void pairWithWiimote() {
   if (connectedSerial) {
-    serial.write("CW;"); // Pair with Wiimote
+    serial.write("CPW;"); // Pair with Wiimote
     println("Pair with Wiimote");
     delay(10);
   } else
