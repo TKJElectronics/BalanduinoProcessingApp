@@ -17,8 +17,10 @@ void initDropdownlist() {
 
   // Now add the ports to the list, we use a for loop for that
   for (int i = 0; i < Serial.list().length; i++) {
+    if (Serial.list()[i].indexOf("/dev/cu.") != -1)
+      continue; // Do not display /dev/cu.* devices
     dropdownList.addItem(Serial.list()[i], i); // This is the line doing the actual adding of items, we use the current loop we are in to determine what place in the char array to access and what item number to add it as
-    if (Serial.list()[i].indexOf("Balanduino") != -1 && dropdownList.getValue() == 0) // Check for the "Balanduino" substring and make sure it is not already set
+    if (Serial.list()[i].indexOf("Balanduino") != -1) // Check for the "Balanduino" substring
       dropdownList.setValue(i); // Automaticly select the Balanduino balancing robot on Mac OS X and Linux
   }
 
