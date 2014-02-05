@@ -1,6 +1,7 @@
 import processing.serial.*;
 import controlP5.*;
 import java.awt.event.*;
+import java.awt.Image;
 
 ControlP5 controlP5;
 
@@ -34,6 +35,9 @@ final int mainWidth = 337; // Width of the main control panel
 
 void setup() {
   frame.setTitle("Balanduino Processing App");
+
+  PImage icon = loadImage("icons/logo.png");
+  frame.setIconImage((Image) icon.getNative());
 
   controlP5 = new ControlP5(this);
   size(937, 370);
