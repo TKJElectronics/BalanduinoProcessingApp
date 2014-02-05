@@ -453,8 +453,8 @@ void connect() {
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
-      //e.printStackTrace();
       println("Couldn't open serial port");
+      e.printStackTrace();
     }
     if (serial != null) {
       serial.bufferUntil('\n');
