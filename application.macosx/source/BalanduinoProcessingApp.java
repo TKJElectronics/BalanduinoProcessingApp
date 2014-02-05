@@ -50,6 +50,8 @@ float[] kalman = new float[101];
 
 boolean drawValues; // This is set to true whenever there is any new data
 
+final int mainWidth = 337; // Width of the main control panel
+
 public void setup() {
   controlP5 = new ControlP5(this);
   size(937, 370);
@@ -60,19 +62,19 @@ public void setup() {
 
   /* For remote control */
   controlP5.addButton("up")
-           .setPosition(337/2-20, 70)
+           .setPosition(mainWidth / 2 - 20, 70)
            .setSize(40, 20);
 
   controlP5.addButton("down")
-           .setPosition(337/2-20, 92)
+           .setPosition(mainWidth / 2 - 20, 92)
            .setSize(40, 20);
 
   controlP5.addButton("left")
-           .setPosition(337/2-62, 92)
+           .setPosition(mainWidth / 2 - 62, 92)
            .setSize(40, 20);
 
   controlP5.addButton("right")
-           .setPosition(337/2+22, 92)
+           .setPosition(mainWidth / 2 + 22, 92)
            .setSize(40, 20);
 
   /* For setting the PID values etc. */
@@ -127,6 +129,11 @@ public void setup() {
            .setSize(65, 20)
            .setCaptionLabel("Store values");
 
+  controlP5.addButton("pairWithPS4")
+           .setPosition(245, 290)
+           .setSize(82, 20)
+           .setCaptionLabel("Pair with PS4");
+
   controlP5.addButton("pairWithWiimote")
            .setPosition(245, 315)
            .setSize(82, 20)
@@ -137,10 +144,10 @@ public void setup() {
            .setSize(82, 20)
            .setCaptionLabel("Restore defaults");
 
-  for (int i=0;i<acc.length;i++) { // center all variables
-    acc[i] = height/2;
-    gyro[i] = height/2;
-    kalman[i] = height/2;
+  for (int i = 0; i < acc.length; i++) { // center all variables
+    acc[i] = height / 2;
+    gyro[i] = height / 2;
+    kalman[i] = height / 2;
   }
 
   //println(Serial.list()); // Used for debugging
@@ -163,20 +170,20 @@ public void draw() {
   /* Remote contol */
   fill(0);
   stroke(0);
-  rect(0, 0, 337, height);
+  rect(0, 0, mainWidth, height);
   fill(0, 102, 153);
   textSize(25);
   textFont(font25);
   textAlign(CENTER);
-  text("Press buttons to steer", 337/2, 55);
+  text("Press buttons to steer", mainWidth / 2, 55);
 
   /* Set PID value etc. */
   fill(0, 102, 153);
   textSize(30);
   textFont(font30);
   textAlign(CENTER);
-  text("Set PID Values:", 337/2, 155);
-  text("Current PID Values:", 337/2, 250);
+  text("Set PID Values:", mainWidth / 2, 155);
+  text("Current PID Values:", mainWidth / 2, 250);
 
   fill(255, 255, 255);
   textSize(10);
@@ -219,6 +226,7 @@ public void draw() {
     sendData = false;
   }
 }
+
 public void abort() {
   if (connectedSerial) {
     serial.write("A;");
@@ -227,6 +235,7 @@ public void abort() {
   } else
     println("Establish a serial connection first!");
 }
+
 public void continueAbort() {
   if (connectedSerial) {
     serial.write("C");
@@ -235,6 +244,7 @@ public void continueAbort() {
   } else
     println("Establish a serial connection first!");
 }
+
 public void submit() {
   if (connectedSerial) {
     println("PID values: " + P.getText() + " " + I.getText() + " " + D.getText() +  " TargetAnlge: " + targetAngle.getText());
@@ -263,12 +273,14 @@ public void submit() {
   } else
     println("Establish a serial connection first!");
 }
+
 public void clear() {
   P.clear();
   I.clear();
   D.clear();
   targetAngle.clear();
 }
+
 public void restoreDefaults() {
   if (connectedSerial) {
     serial.write("CR;"); // Restore values
@@ -277,14 +289,25 @@ public void restoreDefaults() {
   } else
     println("Establish a serial connection first!");
 }
+
+public void pairWithPS4() {
+  if (connectedSerial) {
+    serial.write("CPP;"); // Pair with PS4
+    println("Pair with PS4 controller");
+    delay(10);
+  } else
+    println("Establish a serial connection first!");
+}
+
 public void pairWithWiimote() {
   if (connectedSerial) {
-    serial.write("CW;"); // Pair with Wiimote
+    serial.write("CPW;"); // Pair with Wiimote
     println("Pair with Wiimote");
     delay(10);
   } else
     println("Establish a serial connection first!");
 }
+
 public void storeValues() {
   // Don't set the text if the string is empty or it will throw an exception
   if (stringP != null)
@@ -296,6 +319,7 @@ public void storeValues() {
   if (stringTargetAngle != null)
     targetAngle.setText(stringTargetAngle);
 }
+
 public void serialEvent(Serial serial) {
   String[] input = trim(split(serial.readString(), ','));
 
@@ -327,7 +351,7 @@ public void serialEvent(Serial serial) {
     voltage  = input[1] + 'V';
     String runtime = input[2];
     minutes = str((int)floor(PApplet.parseFloat(runtime)));
-    seconds = str((int)(PApplet.parseFloat(runtime)%1/(1.0f/60.0f)));
+    seconds = str((int)(PApplet.parseFloat(runtime) % 1 / (1.0f / 60.0f)));
   } else if (input[0].equals("V") && input.length == 4) { // IMU data
     stringAcc = input[1];
     stringGyro = input[2];
@@ -340,6 +364,7 @@ public void serialEvent(Serial serial) {
   serial.clear();  // Empty the buffer
   drawValues = true; // Draw the graph
 }
+
 public void keyPressed() {
   if (key == 's' || key == 'S')
     storeValues();
@@ -398,6 +423,7 @@ public void keyPressed() {
       println("Establish a serial connection first!");
   }
 }
+
 public void keyReleased() {
   if (connectedSerial) {
     if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus()) {
@@ -424,12 +450,14 @@ public void keyReleased() {
   } else
     println("Establish a serial connection first!");
 }
+
 public void controlEvent(ControlEvent theEvent) {
   if (theEvent.isGroup()) {
     if (theEvent.getGroup().getName() == dropdownList.getName())
       portNumber = PApplet.parseInt(theEvent.getGroup().getValue()); // Since the list returns a float, we need to convert it to an int. For that we us the int() function
   }
 }
+
 public void connect() {
   if (connectedSerial) // Disconnect existing connection
     disconnect();
@@ -481,49 +509,49 @@ public void drawGraph() {
   background(255); // Set background to white
 
   stroke(200); // Grey
-  for (int i = 0;i<gyro.length;i++) { // Draw graph paper
-    line(337+i*10, 0, 337+i*10, height);
-    line(337, i*10, 337+width, i*10);
+  for (int i = 0; i < gyro.length; i++) { // Draw graph paper
+    line(mainWidth + i * 10, 0, mainWidth + i * 10, height);
+    line(mainWidth, i * 10, width, i * 10);
   }
 
   stroke(0); // Black
   for (int i = 1; i <= 3; i++)
-    line(337, height/4*i, width, height/4*i); // Draw lines indicating 90 deg, 180 deg, and 270 deg
+    line(mainWidth, height / 4 * i, width, height / 4 * i); // Draw lines indicating 90 deg, 180 deg, and 270 deg
 
   if (stringGyro != null)
-    gyro[gyro.length-1] = map(PApplet.parseFloat(trim(stringGyro)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    gyro[gyro.length - 1] = map(PApplet.parseFloat(trim(stringGyro)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringAcc != null)
-    acc[acc.length-1] = map(PApplet.parseFloat(trim(stringAcc)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    acc[acc.length - 1] = map(PApplet.parseFloat(trim(stringAcc)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringKalman != null)
-    kalman[kalman.length-1] = map(PApplet.parseFloat(trim(stringKalman)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    kalman[kalman.length - 1] = map(PApplet.parseFloat(trim(stringKalman)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
 
   noFill();
 
   // Draw acceleromter x-axis
-  stroke(255,0,0); // Red
+  stroke(255, 0, 0); // Red
   beginShape();
-  for (int i = 0; i<acc.length;i++)
-    vertex(i*6+337,height-acc[i]);
+  for (int i = 0; i < acc.length; i++)
+    vertex(i * 6 + mainWidth, height - acc[i]);
   endShape();
 
   // Draw gyro x-axis
-  stroke(0,255,0); // Green
+  stroke(0, 255, 0); // Green
   beginShape();
-  for (int i = 0; i<gyro.length;i++)
-    vertex(i*6+337,height-gyro[i]);
+  for (int i = 0; i < gyro.length; i++)
+    vertex(i * 6 + mainWidth, height - gyro[i]);
   endShape();
 
   // Draw kalman filter x-axis
-  stroke(0,0,255); // Blue
+  stroke(0, 0, 255); // Blue
   beginShape();
-  for (int i = 0; i<kalman.length;i++)
-    vertex(i*6+337,height-kalman[i]);
+  for (int i = 0; i < kalman.length; i++)
+    vertex(i * 6 + mainWidth, height - kalman[i]);
   endShape();
 
-  for (int i = 1; i<acc.length;i++) { // Put all data one array back
-    acc[i-1] = acc[i];
-    gyro[i-1] = gyro[i];
-    kalman[i-1] = kalman[i];
+  for (int i = 1; i < acc.length; i++) { // Put all data one array back
+    acc[i - 1] = acc[i];
+    gyro[i - 1] = gyro[i];
+    kalman[i - 1] = kalman[i];
   }
 }
 public void initDropdownlist() {
@@ -543,17 +571,20 @@ public void initDropdownlist() {
   dropdownList.setColorBackground(color(60));
   dropdownList.setColorActive(color(255, 128));
 
-  // Now well add the ports to the list, we use a for loop for that
-  for (int i=0; i<Serial.list().length; i++) {
+  // Now add the ports to the list, we use a for loop for that
+  for (int i = 0; i < Serial.list().length; i++) {
+    if (Serial.list()[i].indexOf("/dev/cu.") != -1)
+      continue; // Do not display /dev/cu.* devices
     dropdownList.addItem(Serial.list()[i], i); // This is the line doing the actual adding of items, we use the current loop we are in to determine what place in the char array to access and what item number to add it as
-    if (Serial.list()[i].indexOf("Balanduino") != -1 && dropdownList.getValue() == 0) // Check for the "Balanduino" substring and make sure it is not already set
+    if (Serial.list()[i].indexOf("Balanduino") != -1) // Check for the "Balanduino" substring
       dropdownList.setValue(i); // Automaticly select the Balanduino balancing robot on Mac OS X and Linux
   }
 
   addMouseWheelListener(new MouseWheelListener() { // Add a mousewheel listener to scroll the dropdown list
     public void mouseWheelMoved(MouseWheelEvent mwe) {
       dropdownList.scroll(mwe.getWheelRotation() > 0 ? 1 : 0); // Scroll the dropdownlist using the mousewheel
-  }});
+    }
+  });
 
   controlP5.addButton("connect")
            .setPosition(225, 3)
