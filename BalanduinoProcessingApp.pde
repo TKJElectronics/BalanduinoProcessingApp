@@ -33,6 +33,8 @@ boolean drawValues; // This is set to true whenever there is any new data
 final int mainWidth = 337; // Width of the main control panel
 
 void setup() {
+  frame.setTitle("Balanduino Processing App");
+
   controlP5 = new ControlP5(this);
   size(937, 370);
 
