@@ -1,4 +1,4 @@
-To use the app with Linux you will first need to figure out the Bluetooth address of the Balanduino by running the following command:
+To use the app with Linux via Bluetooth you will first need to figure out the Bluetooth address of the Balanduino by running the following command:
 
 ```
 $ hcitool scan
