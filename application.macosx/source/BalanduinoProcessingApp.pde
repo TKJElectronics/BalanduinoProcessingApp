@@ -1,6 +1,7 @@
 import processing.serial.*;
 import controlP5.*;
 import java.awt.event.*;
+import java.awt.Image;
 
 ControlP5 controlP5;
 
@@ -33,6 +34,9 @@ boolean drawValues; // This is set to true whenever there is any new data
 final int mainWidth = 337; // Width of the main control panel
 
 void setup() {
+  frame.setTitle("Balanduino Processing App");
+  frame.setIconImage((Image) loadImage("data/logo.png").getNative());
+
   controlP5 = new ControlP5(this);
   size(937, 370);
 
@@ -447,8 +451,8 @@ void connect() {
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
-      //e.printStackTrace();
       println("Couldn't open serial port");
+      e.printStackTrace();
     }
     if (serial != null) {
       serial.bufferUntil('\n');

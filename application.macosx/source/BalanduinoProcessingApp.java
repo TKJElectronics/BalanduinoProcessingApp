@@ -6,6 +6,7 @@ import processing.opengl.*;
 import processing.serial.*; 
 import controlP5.*; 
 import java.awt.event.*; 
+import java.awt.Image; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -17,6 +18,7 @@ import java.io.OutputStream;
 import java.io.IOException; 
 
 public class BalanduinoProcessingApp extends PApplet {
+
 
 
 
@@ -53,6 +55,9 @@ boolean drawValues; // This is set to true whenever there is any new data
 final int mainWidth = 337; // Width of the main control panel
 
 public void setup() {
+  frame.setTitle("Balanduino Processing App");
+  frame.setIconImage((Image) loadImage("data/logo.png").getNative());
+
   controlP5 = new ControlP5(this);
   size(937, 370);
 
@@ -467,8 +472,8 @@ public void connect() {
     try {
       serial = new Serial(this, Serial.list()[portNumber], 115200);
     } catch (Exception e) {
-      //e.printStackTrace();
       println("Couldn't open serial port");
+      e.printStackTrace();
     }
     if (serial != null) {
       serial.bufferUntil('\n');
