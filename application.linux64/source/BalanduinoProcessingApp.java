@@ -56,9 +56,7 @@ final int mainWidth = 337; // Width of the main control panel
 
 public void setup() {
   frame.setTitle("Balanduino Processing App");
-
-  PImage icon = loadImage("icons/logo.png");
-  frame.setIconImage((Image) icon.getNative());
+  frame.setIconImage((Image) loadImage("data/logo.png").getNative());
 
   controlP5 = new ControlP5(this);
   size(937, 370);
