@@ -1,2 +1,2 @@
 @echo off
-java -Djava.ext.dirs=lib -Djava.library.path=lib BalanduinoProcessingApp
+java\bin\java -Djava.ext.dirs=lib -Djava.library.path=lib BalanduinoProcessingApp
