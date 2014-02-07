@@ -1,4 +1,4 @@
 #!/bin/sh
 
 APPDIR=$(dirname "$0")
-java  -Djava.library.path="$APPDIR:$APPDIR/lib" -cp "$APPDIR/lib/BalanduinoProcessingApp.jar:$APPDIR/lib/core.jar:$APPDIR/lib/jogl-all.jar:$APPDIR/lib/gluegen-rt.jar:$APPDIR/lib/jogl-all-natives-linux-amd64.jar:$APPDIR/lib/gluegen-rt-natives-linux-amd64.jar:$APPDIR/lib/jssc.jar:$APPDIR/lib/serial.jar:$APPDIR/lib/controlP5.jar" BalanduinoProcessingApp "$@"
+java/bin/java  -Djava.library.path="$APPDIR:$APPDIR/lib" -cp "$APPDIR/lib/BalanduinoProcessingApp.jar:$APPDIR/lib/core.jar:$APPDIR/lib/jogl-all.jar:$APPDIR/lib/gluegen-rt.jar:$APPDIR/lib/jogl-all-natives-linux-amd64.jar:$APPDIR/lib/gluegen-rt-natives-linux-amd64.jar:$APPDIR/lib/serial.jar:$APPDIR/lib/jssc.jar:$APPDIR/lib/controlP5.jar" BalanduinoProcessingApp "$@"
