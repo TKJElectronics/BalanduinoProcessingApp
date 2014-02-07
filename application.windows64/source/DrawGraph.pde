@@ -1,4 +1,4 @@
-final int minAngle = 0, maxAngle = 360;
+final int minIMUAngle = 0, maxIMUAngle = 360;
 
 void drawGraph() {
   background(255); // Set background to white
@@ -14,11 +14,11 @@ void drawGraph() {
     line(mainWidth, height / 4 * i, width, height / 4 * i); // Draw lines indicating 90 deg, 180 deg, and 270 deg
 
   if (stringGyro != null)
-    gyro[gyro.length - 1] = map(float(trim(stringGyro)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    gyro[gyro.length - 1] = map(float(trim(stringGyro)), minIMUAngle, maxIMUAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringAcc != null)
-    acc[acc.length - 1] = map(float(trim(stringAcc)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    acc[acc.length - 1] = map(float(trim(stringAcc)), minIMUAngle, maxIMUAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
   if (stringKalman != null)
-    kalman[kalman.length - 1] = map(float(trim(stringKalman)), minAngle, maxAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
+    kalman[kalman.length - 1] = map(float(trim(stringKalman)), minIMUAngle, maxIMUAngle, 0, height); // Convert to an float and map to the screen height, then save in buffer
 
   noFill();
 
@@ -26,21 +26,21 @@ void drawGraph() {
   stroke(255, 0, 0); // Red
   beginShape();
   for (int i = 0; i < acc.length; i++)
-    vertex(i * 6 + mainWidth, height - acc[i]);
+    vertex(i * 7 + mainWidth, height - acc[i]);
   endShape();
 
   // Draw gyro x-axis
   stroke(0, 255, 0); // Green
   beginShape();
   for (int i = 0; i < gyro.length; i++)
-    vertex(i * 6 + mainWidth, height - gyro[i]);
+    vertex(i * 7 + mainWidth, height - gyro[i]);
   endShape();
 
   // Draw kalman filter x-axis
   stroke(0, 0, 255); // Blue
   beginShape();
   for (int i = 0; i < kalman.length; i++)
-    vertex(i * 6 + mainWidth, height - kalman[i]);
+    vertex(i * 7 + mainWidth, height - kalman[i]);
   endShape();
 
   for (int i = 1; i < acc.length; i++) { // Put all data one array back
