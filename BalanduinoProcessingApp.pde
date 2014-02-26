@@ -33,6 +33,7 @@ float[] kalman = new float[101];
 boolean drawValues; // This is set to true whenever there is any new data
 
 final int mainWidth = 337; // Width of the main control panel
+final int graphWidth = 700; // Width of the graph
 
 void setup() {
   registerMethod("dispose", this); // Called automatically before shutting down
@@ -41,7 +42,7 @@ void setup() {
   frame.setIconImage((Image) loadImage("data/logo.png").getNative());
 
   controlP5 = new ControlP5(this);
-  size(mainWidth + 700, 510);
+  size(mainWidth + graphWidth, 510);
 
   font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
   font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
@@ -187,7 +188,7 @@ void setup() {
 
 void draw() {
   /* Draw Graph */
- if (connectedSerial && drawValues) {
+  if (connectedSerial && drawValues) {
     drawValues = false;
     drawGraph();
   }
@@ -478,7 +479,7 @@ void controlEvent(ControlEvent theEvent) {
 
 void connect() {
   disconnect(); // Disconnect any existing connection
-  if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
+  if (portNumber != -1) { // Check if com port and baudrate is set and if there is not already a connection established
     println("ConnectSerial");
     dropdownList.close();
     try {
