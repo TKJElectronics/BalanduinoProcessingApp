@@ -33,6 +33,7 @@ float[] kalman = new float[101];
 boolean drawValues; // This is set to true whenever there is any new data
 
 final int mainWidth = 337; // Width of the main control panel
+final int graphWidth = 700; // Width of the graph
 
 void setup() {
   registerMethod("dispose", this); // Called automatically before shutting down
@@ -41,7 +42,7 @@ void setup() {
   frame.setIconImage((Image) loadImage("data/logo.png").getNative());
 
   controlP5 = new ControlP5(this);
-  size(mainWidth + 700, 510);
+  size(mainWidth + graphWidth, 510);
 
   font10 = loadFont("EuphemiaUCAS-Bold-10.vlw");
   font25 = loadFont("EuphemiaUCAS-Bold-25.vlw");
@@ -187,7 +188,7 @@ void setup() {
 
 void draw() {
   /* Draw Graph */
- if (connectedSerial && drawValues) {
+  if (connectedSerial && drawValues) {
     drawValues = false;
     drawGraph();
   }
@@ -436,59 +437,37 @@ void keyPressed() {
   else if (key == ESC) {
     disconnect(); // Disconnect serial connection
     key = 0; // Disable Processing from quiting when pressing ESC
-  } else if (key == CODED) {
-    if (connectedSerial) {
-      if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus() && !maxAngle.isFocus() && !maxTurn.isFocus() && !Qangle.isFocus() && !Qbias.isFocus() && !Rmeasure.isFocus()) {
-        if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
-          if (keyCode == LEFT) {
-            leftPressed = true;
-            println("Left pressed");
-          }
-          if (keyCode == UP) {
-            upPressed = true;
-            println("Forward pressed");
-          }
-          if (keyCode == DOWN) {
-            downPressed = true;
-            println("Backward pressed");
-          }
-          if (keyCode == RIGHT) {
-            rightPressed = true;
-            println("Right pressed");
-          }
-          sendData = true;
-        }
-      }
-    } else
-      println("Establish a serial connection first!");
-  }
+  } else if (key == CODED)
+    handleButtons(keyCode, true);
 }
 
-void keyReleased() {
+void handleButtons(int button, boolean pressed) {
   if (connectedSerial) {
     if (!P.isFocus() && !I.isFocus() && !D.isFocus() && !targetAngle.isFocus() && !maxAngle.isFocus() && !maxTurn.isFocus() && !Qangle.isFocus() && !Qbias.isFocus() && !Rmeasure.isFocus()) {
-      if (keyCode == LEFT || keyCode == UP || keyCode == DOWN || keyCode == RIGHT) {
-        if (keyCode == LEFT) {
-          leftPressed = false;
-          println("Left released");
-        }
-        if (keyCode == UP) {
-          upPressed = false;
-          println("Up released");
-        }
-        if (keyCode == DOWN) {
-          downPressed = false;
-          println("Down released");
-        }
-        if (keyCode == RIGHT) {
-          rightPressed = false;
-          println("Right released");
+      if (button == LEFT || button == UP || button == DOWN || button == RIGHT) {
+        if (button == LEFT) {
+          leftPressed = pressed;
+          println("Left " + (pressed ? "pressed" : "released"));
+        } else if (button == UP) {
+          upPressed = pressed;
+          println("Up " + (pressed ? "pressed" : "released"));
+        } else if (button == DOWN) {
+          downPressed = pressed;
+          println("Down " + (pressed ? "pressed" : "released"));
+        } else if (button == RIGHT) {
+          rightPressed = pressed;
+          println("Right " + (pressed ? "pressed" : "released"));
         }
         sendData = true;
       }
     }
   } else
     println("Establish a serial connection first!");
+}
+
+void keyReleased() {
+  if (key == CODED)
+    handleButtons(keyCode, false);
 }
 
 void controlEvent(ControlEvent theEvent) {
@@ -500,7 +479,7 @@ void controlEvent(ControlEvent theEvent) {
 
 void connect() {
   disconnect(); // Disconnect any existing connection
-  if (portNumber != -1 && !connectedSerial) { // Check if com port and baudrate is set and if there is not already a connection established
+  if (portNumber != -1) { // Check if com port and baudrate is set and if there is not already a connection established
     println("ConnectSerial");
     dropdownList.close();
     try {

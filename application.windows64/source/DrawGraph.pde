@@ -26,21 +26,21 @@ void drawGraph() {
   stroke(255, 0, 0); // Red
   beginShape();
   for (int i = 0; i < acc.length; i++)
-    vertex(i * 7 + mainWidth, height - acc[i]);
+    vertex(i * graphWidth / (acc.length - 1) + mainWidth, height - acc[i]);
   endShape();
 
   // Draw gyro x-axis
   stroke(0, 255, 0); // Green
   beginShape();
   for (int i = 0; i < gyro.length; i++)
-    vertex(i * 7 + mainWidth, height - gyro[i]);
+    vertex(i * graphWidth / (gyro.length - 1) + mainWidth, height - gyro[i]);
   endShape();
 
   // Draw kalman filter x-axis
   stroke(0, 0, 255); // Blue
   beginShape();
   for (int i = 0; i < kalman.length; i++)
-    vertex(i * 7 + mainWidth, height - kalman[i]);
+    vertex(i * graphWidth / (kalman.length - 1) + mainWidth, height - kalman[i]);
   endShape();
 
   for (int i = 1; i < acc.length; i++) { // Put all data one array back
